@@ -290,14 +290,26 @@ body.embed-front-mode #mod-visuals > summary {
   display:none !important;
 }
 body.embed-front-mode{ background:transparent !important; }
-body.embed-front-mode .layout{ display:block !important; }
-body.embed-front-mode main.dash{ padding:0 !important; max-width:none !important; }
+html.embed-front-mode, html.embed-front-mode body{ overflow:hidden !important; height:100%; margin:0; padding:0; }
+body.embed-front-mode .layout{ display:block !important; overflow:hidden !important; }
+body.embed-front-mode main.dash{ padding:0 !important; max-width:none !important; overflow:hidden !important; }
 body.embed-front-mode #mod-visuals{ border:none !important; background:transparent !important; margin:0 !important; }
 body.embed-front-mode #mod-visuals .module-content{ padding:0 !important; }
 body.embed-front-mode .views{ display:block !important; }
-body.embed-front-mode .viewpanel{ border:none !important; background:transparent !important; padding:0 !important; height:100% !important; }
+body.embed-front-mode .viewpanel{ border:none !important; background:transparent !important; padding:0 !important; height:100vh !important; box-sizing:border-box; }
 body.embed-front-mode .viewpanel .vt{ display:none !important; }
-body.embed-front-mode #svgFront{ width:100%; height:100%; }
+body.embed-front-mode #svgFront{ width:100%; height:100%; display:block; }
+
+/* Recolor the linkage to match the portfolio's graphite/steel/orange palette
+   instead of the simulator's native lime/amber/cyan/magenta scheme */
+body.embed-front-mode svg [stroke="#FFB020"]{ stroke:#8fc4ea !important; } /* upper wishbone -> steel-bright */
+body.embed-front-mode svg [stroke="#4FD8E8"]{ stroke:#5b9bc4 !important; } /* lower wishbone -> steel */
+body.embed-front-mode svg [stroke="#FF4FD1"]{ stroke:#e85d2d !important; } /* tie rod / steering -> orange accent */
+body.embed-front-mode svg [stroke="#C9FF3D"]{ stroke:#f2f4f6 !important; } /* upright + wheel -> paper white */
+body.embed-front-mode svg [fill="#FFB020"]{ fill:#8fc4ea !important; }
+body.embed-front-mode svg [fill="#4FD8E8"]{ fill:#5b9bc4 !important; }
+body.embed-front-mode svg [fill="#FF4FD1"]{ fill:#e85d2d !important; }
+body.embed-front-mode svg [fill="#C9FF3D"]{ fill:#f2f4f6 !important; }
 </style>
 </head>
 <body>
@@ -1856,6 +1868,7 @@ window.addEventListener('load', updateDockOffset);
 // ===== Embed mode driver: auto-sweeps the real travel slider for the portfolio hero =====
 if (new URLSearchParams(location.search).get('embed') === 'front') {
   document.body.classList.add('embed-front-mode');
+  document.documentElement.classList.add('embed-front-mode');
   window.addEventListener('load', function(){
     const slider = document.getElementById('travelSlider');
     if (!slider) return;
