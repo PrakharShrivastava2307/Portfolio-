@@ -1,0 +1,2177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Baja Front Suspension Kinematics</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@400;500;600&family=Oswald:wght@500;600&family=Rajdhani:wght@500;600;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0B0E11;
+    --panel:#12161B;
+    --panel-2:#161B21;
+    --border:#232A32;
+    --border-hover: #3A4552;
+    --text:#E7EDF2;
+    --muted:#8A96A3;
+    --dim:#586270;
+    --lime:#C9FF3D;
+    --cyan:#4FD8E8;
+    --amber:#FFB020;
+    --red:#FF5C5C;
+    --magenta:#FF4FD1;
+    --mono: 'JetBrains Mono','IBM Plex Mono',ui-monospace,monospace;
+    --disp: 'Rajdhani','Oswald',sans-serif;
+    --body: 'Inter',-apple-system,sans-serif;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;background:var(--bg);color:var(--text);font-family:var(--body);}
+  body{min-height:100vh; overflow-x: hidden;}
+  ::selection{background:var(--lime);color:#0B0E11;}
+
+  header.top{
+    display:flex;align-items:center;justify-content:space-between;
+    padding:14px 22px;border-bottom:1px solid var(--border);
+    background:linear-gradient(180deg,#12161B,#0F1215);
+    position:sticky;top:0;z-index:20;
+  }
+  .brand{display:flex;align-items:baseline;gap:10px;}
+  .brand .mark{color:var(--lime);font-family:var(--mono);font-size:12px;letter-spacing:.18em;border:1px solid var(--lime);padding:3px 7px;border-radius:3px;}
+  .brand h1{font-family:var(--disp);font-weight:600;font-size:20px;letter-spacing:.02em;margin:0;}
+  .brand p{margin:0;color:var(--muted);font-size:12px;}
+  button.reset{
+    background:transparent;border:1px solid var(--border);color:var(--muted);
+    font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;
+    padding:8px 14px;border-radius:4px;cursor:pointer;transition:.15s;
+  }
+  button.reset:hover{border-color:var(--lime);color:var(--lime);}
+
+  .tabbar{display:flex;gap:2px;padding:0 22px;background:var(--panel);border-bottom:1px solid var(--border);position:sticky;top:61px;z-index:19;}
+  @media (max-width:640px){.tabbar{padding:0 12px;}}
+  .tabbtn{
+    background:transparent;border:none;color:var(--muted);font-family:var(--disp);font-weight:600;
+    font-size:13.5px;letter-spacing:.03em;padding:12px 18px;cursor:pointer;position:relative;
+    border-bottom:2px solid transparent;transition:.15s;text-transform:uppercase;
+  }
+  .tabbtn:hover{color:var(--text);}
+  .tabbtn.active{color:var(--lime);border-bottom-color:var(--lime);}
+  .tabbtn .dot{display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--magenta);margin-left:7px;vertical-align:middle;}
+  .tabpanel{display:none;}
+  .tabpanel.active{display:block;}
+
+  .layout{display:grid;grid-template-columns:340px 1fr;min-height:calc(100vh - 62px); align-items: start;}
+  @media (max-width:900px){.layout{grid-template-columns:1fr;}}
+
+  aside.sidebar{
+    border-right:1px solid var(--border);background:var(--panel);
+    padding:16px;overflow-y:auto;max-height:calc(100vh - 62px);
+    position: sticky; top: 62px;
+  }
+  /* On narrow / mobile viewports the sidebar becomes a normal block that
+     flows above the dashboard, so the whole page (sidebar + every module)
+     is reachable with one continuous scroll instead of a trapped inner
+     scroll region. */
+  @media (max-width:900px){
+    aside.sidebar{
+      position:static; max-height:none; overflow-y:visible;
+      border-right:none; border-bottom:1px solid var(--border);
+    }
+    /* Pinned module keeps using --dock-top (recalculated on resize), which
+       already tracks the smaller mobile header/tabbar height correctly —
+       no separate override needed here. */
+  }
+  @media (max-width:640px){
+    header.top{padding:10px 14px;}
+    .brand h1{font-size:16px;}
+    .brand p{display:none;}
+    button.reset{padding:7px 10px;font-size:10px;}
+    main.dash{padding:12px;gap:12px;}
+    .module-content{padding:12px;}
+    .readouts{grid-template-columns:repeat(auto-fit, minmax(135px, 1fr));gap:8px;}
+    .card{padding:10px 12px;}
+    .card .val{font-size:21px;}
+    .legend{gap:10px !important;font-size:10px !important;}
+  }
+  aside.sidebar h2.hint{font-family:var(--body);font-size:11.5px;color:var(--muted);line-height:1.5;margin:0 0 16px;padding:10px 12px;background:var(--panel-2);border:1px solid var(--border);border-radius:6px;font-weight:400;}
+  aside.sidebar h2.hint b{color:var(--lime);font-weight:600;}
+
+  details.group{border:1px solid var(--border);border-radius:6px;margin-bottom:10px;background:var(--panel-2);overflow:hidden;}
+  details.group[open]{border-color:#2C3540;}
+  details.group summary{
+    list-style:none;cursor:pointer;padding:10px 12px;
+    font-family:var(--disp);font-weight:600;font-size:13.5px;letter-spacing:.03em;
+    display:flex;align-items:center;justify-content:space-between;color:var(--text);
+    user-select: none;
+  }
+  details.group summary::-webkit-details-marker{display:none;}
+  details.group summary:after{content:'+';color:var(--dim);font-size:16px; transition: color 0.2s;}
+  details.group[open] summary:after{content:'–';color:var(--lime);}
+  details.group summary .tag{color:var(--dim);font-family:var(--mono);font-size:10px;font-weight:400;letter-spacing:0;}
+  details.group summary button.utoggle{
+    color:var(--lime);font-family:var(--mono);font-size:10px;font-weight:600;letter-spacing:.03em;
+    background:rgba(201,255,61,0.08);border:1px solid rgba(201,255,61,0.35);border-radius:4px;
+    padding:2px 7px;cursor:pointer;transition:.15s;line-height:1.4;
+  }
+  details.group summary button.utoggle:hover{background:rgba(201,255,61,0.18);border-color:var(--lime);}
+
+  .pt-block{padding:10px 12px 12px;border-top:1px solid var(--border);}
+  .pt-block:first-of-type{border-top:none;}
+  .pt-block .pt-label{font-size:11.5px;color:var(--muted);margin-bottom:6px;}
+  .pt-block .pt-label b{color:var(--text);}
+  .xyz{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;}
+  .xyz label{display:block;font-family:var(--mono);font-size:9.5px;color:var(--dim);margin-bottom:2px;letter-spacing:.05em;}
+  .xyz input{
+    width:100%;background:#0D1115;border:1px solid var(--border);color:var(--lime);
+    font-family:var(--mono);font-size:12.5px;padding:6px 5px;border-radius:4px;text-align:right; transition: border-color 0.2s;
+  }
+  .xyz input:focus{outline:none;border-color:var(--lime);}
+
+  .setup-row{padding:10px 12px;border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:10px;}
+  .setup-row:first-of-type{border-top:none;}
+  .setup-row label{font-size:12px;color:var(--muted);}
+  .setup-row input[type=number]{
+    width:90px;background:#0D1115;border:1px solid var(--border);color:var(--cyan);
+    font-family:var(--mono);font-size:12.5px;padding:6px 7px;border-radius:4px;text-align:right; transition: border-color 0.2s;
+  }
+  .setup-row input[type=number]:focus { outline:none; border-color:var(--cyan); }
+  .setup-row input[type=checkbox]{accent-color:var(--lime);width:15px;height:15px; cursor: pointer;}
+
+  main.dash{padding:18px 22px; display: flex; flex-direction: column; gap: 16px;}
+  
+  .dash-module {
+    background: var(--panel); border: 1px solid var(--border); border-radius: 8px; 
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2); transition: border-color 0.2s, box-shadow 0.2s;
+  }
+  .dash-module[draggable="true"] { cursor: grab; }
+  .dash-module[draggable="true"]:active { cursor: grabbing; }
+  .dash-module.dragging { opacity: 0.4; border-color: var(--lime); box-shadow: 0 0 20px rgba(201, 255, 61, 0.1); }
+  .dash-module.drag-over { border-top: 2px solid var(--lime); }
+  
+  .dash-module.pinned {
+    position: sticky;
+    /* Docks seamlessly beneath header + tabbar. --dock-top is computed in JS
+       from the tabbar's actual rendered bottom edge (updateDockOffset()) so
+       it stays correct across font-loading shifts and the mobile layout,
+       instead of a hardcoded value that drifted out of sync with the
+       header's real height and left the pinned module sliding underneath
+       the tabbar. */
+    top: var(--dock-top, 104px);
+    z-index: 15;
+    box-shadow: 0 16px 32px rgba(0,0,0,0.6);
+    border: 1px solid var(--lime);
+  }
+
+  .dash-module > summary {
+    background: var(--panel-2); padding: 12px 16px; border-bottom: 1px solid var(--border);
+    font-size: 14px; text-transform: uppercase; letter-spacing: 0.05em; display: flex; align-items: center; justify-content: flex-start; gap: 12px;
+  }
+  .dash-module:not([open]) > summary { border-bottom: none; }
+  .dash-module > summary:after { margin-left: 0; } /* Reset from auto */
+  
+  .pin-btn {
+    margin-left: auto; margin-right: 8px;
+    background: transparent; border: 1px solid transparent; color: var(--dim); cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    padding: 6px; border-radius: 4px; transition: 0.15s;
+  }
+  .pin-btn:hover { color: var(--text); background: var(--panel); border-color: var(--border); }
+  .pin-btn.active { color: var(--bg); background: var(--lime); border-color: var(--lime); }
+
+  .dash-module.pinned .drag-handle { cursor: default; opacity: 0.2; pointer-events: none; }
+
+  .drag-handle { color: var(--dim); cursor: grab; display: flex; align-items: center; font-size: 16px; }
+  .drag-handle:hover { color: var(--text); }
+  
+  .module-content { padding: 16px; }
+
+  .readouts{display:grid;grid-template-columns:repeat(auto-fit, minmax(200px, 1fr));gap:12px;}
+  .card{background:var(--panel-2);border:1px solid var(--border);border-radius:6px;padding:12px 14px;position:relative;overflow:hidden;}
+  .card .lab{font-family:var(--mono);font-size:10px;letter-spacing:.1em;color:var(--dim);text-transform:uppercase;}
+  .card .val{font-family:var(--disp);font-size:26px;font-weight:600;margin-top:4px;color:var(--text);}
+  .card .val2{font-family:var(--mono);font-size:12px;font-weight:500;margin-top:2px;color:var(--muted);}
+  .card .val span.unit{font-size:13px;color:var(--muted);margin-left:3px;font-weight:400;}
+  .card .val2 span.unit{font-size:11px;color:var(--dim);margin-left:4px;}
+  .card.c-camber .val{color:var(--lime);}
+  .card.c-toe .val{color:var(--cyan);}
+  .card.c-caster .val,.card.c-kpi .val{color:var(--amber);}
+  .card.c-trail .val{color:var(--magenta);}
+  .card .bar{position:absolute;left:0;bottom:0;height:2px;background:var(--dim); width: 100%;}
+  .card .bar span{display:block;height:100%;background:currentColor;transition:width .1s;}
+
+  .telemetry-section{margin-bottom:16px;}
+  .telemetry-section:last-child{margin-bottom:0;}
+  .telemetry-section .sec-title{
+    font-family:var(--mono);font-size:10px;letter-spacing:.12em;color:var(--dim);
+    text-transform:uppercase;margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid var(--border);
+  }
+
+  .controls-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+  @media (max-width: 1100px) { .controls-grid { grid-template-columns: 1fr; gap: 16px; } }
+  
+  .travelbar{background:var(--panel-2);border:1px solid var(--border);border-radius:6px;padding:16px;}
+  .travelbar .row1{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:12px;}
+  .travelbar .row1 .t{font-family:var(--disp);font-weight:600;font-size:14px;letter-spacing:.02em;}
+  .travelbar .row1 .v{font-family:var(--mono);color:var(--lime);font-size:15px; background: rgba(201,255,61,0.1); padding: 4px 8px; border-radius: 4px;}
+  input[type=range]{width:100%;accent-color:var(--lime);height:6px; cursor: pointer;}
+  .travelbar .ends{display:flex;justify-content:space-between;font-family:var(--mono);font-size:10px;color:var(--dim);margin-top:8px;}
+
+  /* 2x2 Larger views grid */
+  .views{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;}
+  @media (max-width:800px){.views{grid-template-columns:1fr;}}
+  .viewpanel{background:var(--panel-2);border:1px solid var(--border);border-radius:6px;padding:12px; display: flex; flex-direction: column;}
+  .viewpanel .vt{font-family:var(--mono);font-size:10px;letter-spacing:.1em;color:var(--dim);text-transform:uppercase;margin-bottom:10px;display:flex;justify-content:space-between; border-bottom: 1px solid var(--border); padding-bottom: 6px;}
+  .viewpanel svg{width:100%; height:auto; min-height: 250px; display:block; background: #0F1215; border-radius: 4px;}
+
+  /* 3D rotatable view */
+  .view3d-wrap{background:var(--panel-2);border:1px solid var(--border);border-radius:6px;padding:12px;margin-bottom:16px; display:flex; flex-direction:column;}
+  .view3d-wrap .vt{font-family:var(--mono);font-size:10px;letter-spacing:.1em;color:var(--dim);text-transform:uppercase;margin-bottom:10px;display:flex;justify-content:space-between; border-bottom: 1px solid var(--border); padding-bottom: 6px;}
+  .view3d-canvas{position:relative; width:100%; height:520px; background:#0F1215; border-radius:4px; overflow:hidden;}
+  @media (max-width:640px){.view3d-canvas{height:380px;}}
+  .view3d-canvas canvas{display:block; width:100%; height:100%; touch-action:none; cursor:grab;}
+  .view3d-canvas canvas:active{cursor:grabbing;}
+  .view3d-hint{position:absolute; left:10px; bottom:8px; font-family:var(--mono); font-size:9.5px; letter-spacing:.04em; color:var(--dim); pointer-events:none; background:rgba(11,14,17,0.55); padding:3px 7px; border-radius:4px;}
+  .view3d-controls{position:absolute; top:10px; right:10px; display:flex; gap:6px; flex-wrap:wrap; justify-content:flex-end; max-width:70%;}
+  .view3d-btn{
+    background:rgba(18,22,27,0.85);border:1px solid var(--border);color:var(--muted);
+    font-family:var(--mono);font-size:10px;letter-spacing:.06em;text-transform:uppercase;
+    padding:6px 9px;border-radius:4px;cursor:pointer;transition:.15s;
+  }
+  .view3d-btn:hover{border-color:var(--lime);color:var(--lime);}
+  .view3d-btn.on{border-color:var(--lime);color:var(--lime);background:rgba(201,255,61,0.08);}
+
+  .charts{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+  @media (max-width:800px){.charts{grid-template-columns:1fr;}}
+  .chartpanel{background:var(--panel-2);border:1px solid var(--border);border-radius:6px;padding:12px;}
+  .chartpanel .vt{font-family:var(--mono);font-size:10px;letter-spacing:.1em;color:var(--dim);text-transform:uppercase;margin-bottom:10px; border-bottom: 1px solid var(--border); padding-bottom: 6px;}
+  .chartpanel svg{width:100%;height:auto;display:block; background: #0F1215; border-radius: 4px;}
+
+  .note{font-size:11px;color:var(--dim);margin-top:14px;line-height:1.6;}
+  .warn{color:var(--red);font-family:var(--mono);font-size:11px;margin-top:8px;}
+
+  @media (max-width:900px){ #aiSetsGrid{grid-template-columns:1fr !important;} }
+  .aicard{background:var(--panel-2);border:1px solid var(--border);border-radius:6px;padding:10px 12px;margin-bottom:10px;}
+  .aicard.ok{border-color:#2C4A2C;}
+  .aicard .aic-title{font-family:var(--disp);font-weight:600;font-size:13px;color:var(--text);display:flex;justify-content:space-between;align-items:center;gap:8px;}
+  .aicard .aic-badge{font-family:var(--mono);font-size:9px;letter-spacing:.06em;padding:2px 6px;border-radius:3px;text-transform:uppercase;flex-shrink:0;}
+  .aicard .aic-badge.warn{background:rgba(255,176,32,0.12);color:var(--amber);border:1px solid rgba(255,176,32,0.35);}
+  .aicard .aic-badge.good{background:rgba(201,255,61,0.1);color:var(--lime);border:1px solid rgba(201,255,61,0.3);}
+  .aicard .aic-rationale{font-size:11.5px;color:var(--muted);line-height:1.5;margin:6px 0 8px;}
+  .aicard .aic-deltas{font-family:var(--mono);font-size:10.5px;color:var(--cyan);line-height:1.7;background:#0D1115;border:1px solid var(--border);border-radius:4px;padding:6px 8px;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;}
+  .aicard .aic-deltas .d0{color:var(--dim);}
+  .aicard .aic-delta-list{flex:1;min-width:120px;}
+  .ai-apply-btn{
+    flex-shrink:0;background:rgba(79,216,232,0.1);border:1px solid rgba(79,216,232,0.4);color:var(--cyan);
+    font-family:var(--mono);font-size:9.5px;letter-spacing:.06em;text-transform:uppercase;
+    padding:4px 9px;border-radius:4px;cursor:pointer;transition:.15s;
+  }
+  .ai-apply-btn:hover{background:rgba(79,216,232,0.22);border-color:var(--cyan);}
+  .ai-apply-btn:active{transform:scale(0.96);}
+  .set-summary{font-family:var(--mono);font-size:10.5px;color:var(--muted);letter-spacing:.04em;margin:2px 0 12px;display:flex;gap:14px;}
+  .set-summary .n{color:var(--text);font-weight:600;}
+  .set-summary .tune-n{color:var(--amber);}
+  .set-summary .ok-n{color:var(--lime);}
+  .sync-mini{font-family:var(--mono);font-size:10.5px;color:var(--muted);line-height:1.6;}
+  .sync-mini b{color:var(--text);}
+  #aiPushStatus.flash{color:var(--lime);animation:aiflash 1.6s ease;}
+  @keyframes aiflash{0%{opacity:0;}12%{opacity:1;}80%{opacity:1;}100%{opacity:0;}}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="brand">
+    <span class="mark">RSSR&nbsp;SOLVER</span>
+    <div>
+      <h1>Front Suspension Kinematics</h1>
+      <p>Double wishbone &middot; camber / toe / caster / KPI vs bump-droop travel</p>
+    </div>
+  </div>
+  <button class="reset" id="resetBtn">Reset defaults</button>
+</header>
+
+<nav class="tabbar">
+  <button type="button" class="tabbtn active" id="tabbtn-sim" data-tab="sim">Simulator</button>
+  <button type="button" class="tabbtn" id="tabbtn-ai" data-tab="ai">AI Tuning</button>
+</nav>
+
+<div class="tabpanel active" id="tabpanel-sim">
+<div class="layout">
+  <aside class="sidebar" id="sidebar">
+    <h2 class="hint">Coordinate convention (front view of vehicle, matches ADAMS): <b>X</b> right+, <b>Y</b> up+, <b>Z</b> forward+, all in <b>mm</b>. Defaults loaded below are your raw ADAMS hardpoints.</h2>
+    <details class="group" open>
+      <summary>Vehicle Dimensions <button type="button" class="tag utoggle" data-role="unit">IN</button></summary>
+      <div class="setup-row"><label>Wheel track, both sides (in)</label><input type="number" step="0.05" id="in_trackIn" value="50.00" data-len="1" data-unit="in"></div>
+      <div class="setup-row"><label>Wheelbase (in)</label><input type="number" step="0.1" id="in_wheelbaseIn" value="53.00" data-len="1" data-unit="in"></div>
+      <p class="note" style="margin:0 10px 10px;">Dragging track shifts the upright as a rigid group outboard/inboard together. Wheelbase is used for dynamic Ackermann geometry calculation and to locate the rear-axle plane shown in the Ackermann projection view.</p>
+    </details>
+    
+    <div id="pointGroups"></div>
+
+    <details class="group" id="derivedGroup" open>
+      <summary>Upright &amp; Steering Geometry <button type="button" class="tag utoggle" data-role="unit">MM</button><span class="tag">derived / editable</span></summary>
+      <p class="note" style="margin:8px 10px 4px;">These are calculated from the hardpoints above by default. Edit any field to solve for new hardpoints (ball joints, arm pivots, tie-rod outer, rack end) while holding the other parameters fixed at their current value.</p>
+      <div class="pt-block"><div class="pt-label"><b>Upright</b></div>
+        <div class="xyz" style="grid-template-columns:1fr 1fr;">
+          <div><label>Length (mm)</label><input type="number" step="0.5" id="der_uprightLen" data-len="1" data-unit="mm"></div>
+          <div><label>Upper:Lower ratio (% up)</label><input type="number" step="1" id="der_ratioPct"></div>
+        </div>
+      </div>
+      <div class="pt-block"><div class="pt-label"><b>Stub / spindle</b></div>
+        <div class="xyz" style="grid-template-columns:1fr;">
+          <div><label>Spindle length (mm)</label><input type="number" step="0.5" id="der_spindleLen" data-len="1" data-unit="mm"></div>
+        </div>
+      </div>
+      <div class="pt-block"><div class="pt-label"><b>Kingpin offset</b> <span style="color:var(--dim);">— at hub height, static (read-only)</span></div>
+        <div class="xyz" style="grid-template-columns:1fr;">
+          <div><label>Longitudinal (mm)</label><input type="number" step="0.5" id="der_kpOffsetLong" readonly data-len="1" data-unit="mm" style="color:var(--muted);cursor:not-allowed;"></div>
+        </div>
+      </div>
+      <div class="pt-block"><div class="pt-label"><b>Kingpin angles</b></div>
+        <div class="xyz" style="grid-template-columns:1fr 1fr;">
+          <div><label>KPI (deg)</label><input type="number" step="0.1" id="der_kpi"></div>
+          <div><label>Caster (deg)</label><input type="number" step="0.1" id="der_caster"></div>
+        </div>
+      </div>
+      <div class="pt-block"><div class="pt-label"><b>Upper arm (UCR–UCF)</b></div>
+        <div class="xyz" style="grid-template-columns:1fr 1fr;">
+          <div><label>Arm span (mm)</label><input type="number" step="0.5" id="der_spanU" data-len="1" data-unit="mm"></div>
+          <div><label>Recess angle (deg)</label><input type="number" step="0.1" id="der_recessU"></div>
+        </div>
+      </div>
+      <div class="pt-block"><div class="pt-label"><b>Lower arm (LCR–LCF)</b></div>
+        <div class="xyz" style="grid-template-columns:1fr 1fr;">
+          <div><label>Arm span (mm)</label><input type="number" step="0.5" id="der_spanL" data-len="1" data-unit="mm"></div>
+          <div><label>Recess angle (deg)</label><input type="number" step="0.1" id="der_recessL"></div>
+        </div>
+      </div>
+      <div class="pt-block"><div class="pt-label"><b>Steering knuckle</b></div>
+        <div class="xyz" style="grid-template-columns:1fr 1fr;">
+          <div><label>Knuckle length (mm)</label><input type="number" step="0.5" id="der_knuckleLen" data-len="1" data-unit="mm"></div>
+          <div><label>Knuckle angle, top (deg)</label><input type="number" step="0.1" id="der_knuckleAng"></div>
+        </div>
+      </div>
+      <div class="pt-block"><div class="pt-label"><b>Steering rack</b></div>
+        <div class="xyz" style="grid-template-columns:1fr;">
+          <div><label>Rack length (mm, ±sym.)</label><input type="number" step="0.5" id="der_rackLen" data-len="1" data-unit="mm"></div>
+        </div>
+      </div>
+      <p class="note" style="margin:0 10px 10px;">Recess angle is measured from the longitudinal (Z) axis to the pivot-axis chord in the side (Y–Z) view. Knuckle angle is measured from the outboard (X) axis in top view, about the kingpin axis. <b>Spindle length</b> is the perpendicular lateral (X) distance between the wheel centre and the kingpin axis, taken at wheel-centre height (positive = WC outboard of the axis). <b>Kingpin offset</b> is the perpendicular longitudinal (Z) distance between the wheel centre and the kingpin axis, taken at wheel-centre height (positive = WC forward of the axis). Both are the static reference — see <b>Mechanical Trail</b> and <b>Scrub Radius</b> in Live Telemetry for the live, ground-projected, travel-dependent versions.</p>
+    </details>
+
+    <details class="group" open>
+      <summary>Setup &amp; static angles <button type="button" class="tag utoggle" data-role="unit">MM</button><span class="tag">flip / limits</span></summary>
+      <div class="setup-row"><label>Static camber (deg)</label><input type="number" step="0.1" id="in_staticCamber" value="0"></div>
+      <div class="setup-row"><label>Static toe (deg)</label><input type="number" step="0.1" id="in_staticToe" value="0"></div>
+      <div class="setup-row"><label>Tire radius (mm)</label><input type="number" step="1" id="in_tireR" value="292.1" data-len="1" data-unit="mm"></div>
+      <div class="setup-row"><label>Tire width (mm)</label><input type="number" step="1" id="in_tireW" value="180" data-len="1" data-unit="mm"></div>
+      <div class="setup-row"><label>Bump limit (mm)</label><input type="number" step="1" id="in_bumpLim" value="152.4" data-len="1" data-unit="mm"></div>
+      <div class="setup-row"><label>Droop limit (mm)</label><input type="number" step="1" id="in_droopLim" value="-101.6" data-len="1" data-unit="mm"></div>
+      <p class="note" style="margin:0 10px 10px;">Wheel-travel spec: BUMP 6in (152.4mm) &middot; DROOP 4in (101.6mm).</p>
+      <div class="setup-row"><label>Lock steering (0 bump steer)</label><input type="checkbox" id="in_lockSteer"></div>
+      <div class="setup-row"><label>Flip camber sign</label><input type="checkbox" id="in_flipCamber"></div>
+      <div class="setup-row"><label>Flip toe sign</label><input type="checkbox" id="in_flipToe"></div>
+    </details>
+    <p class="note" id="noteBox">Solved as a spatial 5-bar linkage (bump steer enabled): each wishbone rotates about its inboard pivot axis; the upright is carried between positions by aligning the old kingpin axis to the new one, and then rotated about the kingpin to perfectly satisfy the fixed tie-rod length constraint. KPI & caster read from the kingpin axis.</p>
+    <p class="warn" id="warnBox"></p>
+  </aside>
+
+  <main class="dash" id="mainDash">
+
+    <!-- MODULE 1: CONTROLS -->
+    <details class="dash-module" draggable="true" open id="mod-controls">
+      <summary>
+        <div class="drag-handle">⠿</div> Kinematic Inputs
+        <button class="pin-btn" title="Pin to top">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="17" x2="12" y2="22"></line><path d="M5 17h14v-1.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.68V6a3 3 0 0 0-3-3 3 3 0 0 0-3 3v4.68a2 2 0 0 1-1.11 1.87l-1.78.9A2 2 0 0 0 5 15.24Z"></path></svg>
+        </button>
+      </summary>
+      <div class="module-content">
+        <div class="controls-grid">
+          <div class="travelbar">
+            <div class="row1"><span class="t">Wheel travel <span style="color:var(--dim);font-weight:400; font-size:11px;">(+ bump &middot; − droop)</span></span><span class="v" id="travelVal">0 mm</span></div>
+            <input type="range" id="travelSlider" min="-101.6" max="152.4" step="1" value="0">
+            <div class="ends"><span id="droopLabel">DROOP −102</span><span id="bumpLabel">BUMP +152</span></div>
+          </div>
+          <div class="travelbar">
+            <div class="row1"><span class="t">Steering rack travel <span style="color:var(--dim);font-weight:400; font-size:11px;">(+ right turn &middot; − left turn)</span></span><span class="v" id="rackVal">0.00 in</span></div>
+            <input type="range" id="rackSlider" min="-3" max="3" step="0.05" value="0">
+            <div class="ends"><span>LEFT TURN −3.0 in</span><span>RIGHT TURN +3.0 in</span></div>
+          </div>
+        </div>
+      </div>
+    </details>
+
+    <!-- MODULE 2: TELEMETRY (Readouts) -->
+    <details class="dash-module" draggable="true" open id="mod-telemetry">
+      <summary>
+        <div class="drag-handle">⠿</div> Live Telemetry
+        <button class="pin-btn" title="Pin to top">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="17" x2="12" y2="22"></line><path d="M5 17h14v-1.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.68V6a3 3 0 0 0-3-3 3 3 0 0 0-3 3v4.68a2 2 0 0 1-1.11 1.87l-1.78.9A2 2 0 0 0 5 15.24Z"></path></svg>
+        </button>
+      </summary>
+      <div class="module-content">
+        <div class="telemetry-section">
+          <div class="sec-title">Orientation angles</div>
+          <div class="readouts">
+            <div class="card c-camber"><div class="lab">Camber ( L | R )</div><div class="val" id="out_camber">0.0<span class="unit">&deg;</span></div><div class="val2" id="out_camber_r">0.0<span class="unit">&deg;</span></div><div class="bar"><span id="bar_camber" style="width:50%;background:var(--lime)"></span></div></div>
+            <div class="card c-toe"><div class="lab">Toe ( L | R )</div><div class="val" id="out_toe">0.0<span class="unit">&deg;</span></div><div class="val2" id="out_toe_r">0.0<span class="unit">&deg;</span></div><div class="bar"><span id="bar_toe" style="width:50%;background:var(--cyan)"></span></div></div>
+            <div class="card c-caster"><div class="lab">Caster</div><div class="val" id="out_caster">0.0<span class="unit">&deg;</span></div></div>
+            <div class="card c-kpi"><div class="lab">KPI</div><div class="val" id="out_kpi">0.0<span class="unit">&deg;</span></div></div>
+          </div>
+        </div>
+        <div class="telemetry-section">
+          <div class="sec-title">Trail &amp; scrub <span style="color:var(--dim);text-transform:none;letter-spacing:0;">— ground-plane, live</span></div>
+          <div class="readouts">
+            <div class="card c-trail"><div class="lab">Mechanical Trail (L)</div><div class="val" id="out_trail">0.0<span class="unit">mm</span></div></div>
+            <div class="card"><div class="lab">Scrub Radius (L)</div><div class="val" id="out_scrub">0.0<span class="unit">mm</span></div></div>
+          </div>
+        </div>
+        <div class="telemetry-section">
+          <div class="sec-title">Track &amp; steering</div>
+          <div class="readouts">
+            <div class="card c-track"><div class="lab">Wheel track <span style="color:var(--dim);text-transform:none;">(live)</span></div><div class="val" id="out_track">0<span class="unit">mm</span></div></div>
+            <div class="card"><div class="lab">Inner Track Ang (ITA)</div><div class="val" id="out_ita">0.0<span class="unit">&deg;</span></div></div>
+            <div class="card"><div class="lab">Outer Track Ang (OTA)</div><div class="val" id="out_ota">0.0<span class="unit">&deg;</span></div></div>
+            <div class="card"><div class="lab">Ackermann</div><div class="val" id="out_ack">0.0<span class="unit">%</span></div></div>
+          </div>
+        </div>
+      </div>
+    </details>
+
+    <!-- MODULE 3: VISUALIZERS -->
+    <details class="dash-module" draggable="true" open id="mod-visuals">
+      <summary>
+        <div class="drag-handle">⠿</div> Geometry Visualizer
+        <button class="pin-btn" title="Pin to top">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="17" x2="12" y2="22"></line><path d="M5 17h14v-1.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.68V6a3 3 0 0 0-3-3 3 3 0 0 0-3 3v4.68a2 2 0 0 1-1.11 1.87l-1.78.9A2 2 0 0 0 5 15.24Z"></path></svg>
+        </button>
+      </summary>
+      <div class="module-content">
+        <div class="legend" style="display:flex;gap:16px;flex-wrap:wrap;margin-bottom:14px;font-family:var(--mono);font-size:11px;color:var(--muted);letter-spacing:.04em; justify-content:center;">
+          <span><span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:var(--amber);margin-right:5px;vertical-align:middle;"></span>Upper wishbone</span>
+          <span><span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:var(--cyan);margin-right:5px;vertical-align:middle;"></span>Lower wishbone</span>
+          <span><span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:#FF4FD1;margin-right:5px;vertical-align:middle;"></span>Steering Rack & Tie Rod</span>
+          <span><span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:var(--text);opacity:.55;margin-right:5px;vertical-align:middle;"></span>Kingpin axis</span>
+          <span><span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:var(--lime);margin-right:5px;vertical-align:middle;"></span>Upright Assembly & Wheel</span>
+        </div>
+        
+        <div class="view3d-wrap">
+          <div class="vt"><span>3D View</span><span>fully rotatable</span></div>
+          <div class="view3d-canvas" id="view3dContainer">
+            <canvas id="canvas3D"></canvas>
+            <div class="view3d-hint">drag to orbit &middot; scroll to zoom &middot; right-drag / shift-drag to pan</div>
+            <div class="view3d-controls">
+              <button type="button" class="view3d-btn" id="btn3dIso">Iso</button>
+              <button type="button" class="view3d-btn" id="btn3dFront">Front</button>
+              <button type="button" class="view3d-btn" id="btn3dTop">Top</button>
+              <button type="button" class="view3d-btn" id="btn3dSide">Side</button>
+              <button type="button" class="view3d-btn on" id="btn3dBoth">Both sides</button>
+              <button type="button" class="view3d-btn" id="btn3dReset">Reset</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="views">
+          <div class="viewpanel"><div class="vt"><span>Front view (X–Y)</span><span>camber</span></div><svg id="svgFront" viewBox="0 0 300 260"></svg></div>
+          <div class="viewpanel"><div class="vt"><span>Top view (X–Z)</span><span>toe</span></div><svg id="svgTop" viewBox="0 0 300 260"></svg></div>
+          <div class="viewpanel"><div class="vt"><span>Ackermann (Top)</span><span>projection</span></div><svg id="svgAck" viewBox="0 0 300 260"></svg></div>
+          <div class="viewpanel"><div class="vt"><span>Side view (Z–Y)</span><span>caster</span></div><svg id="svgSide" viewBox="0 0 300 260"></svg></div>
+        </div>
+      </div>
+    </details>
+
+    <!-- MODULE 4: CHARTS -->
+    <details class="dash-module" draggable="true" open id="mod-charts">
+      <summary>
+        <div class="drag-handle">⠿</div> Travel Charts
+        <button class="pin-btn" title="Pin to top">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="17" x2="12" y2="22"></line><path d="M5 17h14v-1.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.68V6a3 3 0 0 0-3-3 3 3 0 0 0-3 3v4.68a2 2 0 0 1-1.11 1.87l-1.78.9A2 2 0 0 0 5 15.24Z"></path></svg>
+        </button>
+      </summary>
+      <div class="module-content">
+        <div class="charts">
+          <div class="chartpanel"><div class="vt">Camber vs travel</div><svg id="chartCamber" viewBox="0 0 480 220"></svg></div>
+          <div class="chartpanel"><div class="vt">Toe vs travel</div><svg id="chartToe" viewBox="0 0 480 220"></svg></div>
+          <div class="chartpanel"><div class="vt">Caster vs travel</div><svg id="chartCaster" viewBox="0 0 480 220"></svg></div>
+          <div class="chartpanel"><div class="vt">KPI vs travel</div><svg id="chartKPI" viewBox="0 0 480 220"></svg></div>
+          <div class="chartpanel"><div class="vt">Mechanical trail vs travel</div><svg id="chartTrail" viewBox="0 0 480 220"></svg></div>
+          <div class="chartpanel"><div class="vt">Scrub radius vs travel</div><svg id="chartScrub" viewBox="0 0 480 220"></svg></div>
+        </div>
+      </div>
+    </details>
+
+  </main>
+</div>
+</div>
+<!-- /tabpanel-sim -->
+
+<div class="tabpanel" id="tabpanel-ai">
+  <main class="dash" id="aiDash" style="max-width:1400px;margin:0 auto;">
+
+    <div class="dash-module" id="ai-intro" style="padding:16px 20px;">
+      <p class="note" style="margin:0;font-size:12.5px;">
+        <b style="color:var(--lime);">AI TUNING</b> reads the live hardpoints and travel-table from the
+        <b>Simulator</b> tab and checks them against general-purpose double-wishbone target ranges
+        (camber gain, bump steer, roll-centre height, KPI/scrub, caster/trail). It proposes two
+        alternative correction packages — <b>Set&nbsp;1</b> keeps wheel track and wheelbase exactly as-is,
+        <b>Set&nbsp;2</b> is allowed to touch track/wheelbase too when that gives a cleaner fix. These are
+        heuristic engineering guidelines, not a substitute for your own judgement or class rules —
+        always sanity-check the resulting charts on the Simulator tab after pushing a change.
+      </p>
+    </div>
+
+    <!-- SYNCED HARDPOINTS -->
+    <details class="dash-module" open id="ai-sync">
+      <summary><div class="drag-handle" style="opacity:.2;">⠿</div> Synced Geometry (live from Simulator)</summary>
+      <div class="module-content">
+        <div id="aiSyncGrid" class="readouts" style="grid-template-columns:repeat(auto-fit, minmax(230px, 1fr));"></div>
+        <div class="readouts" style="margin-top:12px;grid-template-columns:repeat(auto-fit, minmax(180px, 1fr));" id="aiMetricsGrid"></div>
+      </div>
+    </details>
+
+    <!-- SUGGESTIONS -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;" id="aiSetsGrid">
+      <details class="dash-module" open id="ai-set1">
+        <summary><div class="drag-handle" style="opacity:.2;">⠿</div> Set 1 — Track &amp; Wheelbase Locked</summary>
+        <div class="module-content">
+          <p class="note" style="margin:0 0 10px;">Only inboard pivot heights, arm angles and kingpin-axis tilt are adjusted. Wheel centre (track) and wheelbase are untouched.</p>
+          <div class="set-summary" id="setSummary1"></div>
+          <div id="aiCards1"></div>
+          <button type="button" class="reset" id="pushSet1" style="margin-top:10px;width:100%;border-color:var(--lime);color:var(--lime);">Push all Set 1 fixes</button>
+        </div>
+      </details>
+      <details class="dash-module" open id="ai-set2">
+        <summary><div class="drag-handle" style="opacity:.2;">⠿</div> Set 2 — Track / Wheelbase Free</summary>
+        <div class="module-content">
+          <p class="note" style="margin:0 0 10px;">Builds on Set 1 but also allows wheel track width to move, giving more headroom on scrub / roll-centre correction.</p>
+          <div class="set-summary" id="setSummary2"></div>
+          <div id="aiCards2"></div>
+          <button type="button" class="reset" id="pushSet2" style="margin-top:10px;width:100%;border-color:var(--cyan);color:var(--cyan);">Push all Set 2 fixes</button>
+        </div>
+      </details>
+    </div>
+    <p class="note" id="aiPushStatus" style="text-align:center;min-height:16px;"></p>
+
+  </main>
+</div>
+<!-- /tabpanel-ai -->
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+const sub=(a,b)=>[a[0]-b[0],a[1]-b[1],a[2]-b[2]];
+const add=(a,b)=>[a[0]+b[0],a[1]+b[1],a[2]+b[2]];
+const scl=(a,s)=>[a[0]*s,a[1]*s,a[2]*s];
+const dot=(a,b)=>a[0]*b[0]+a[1]*b[1]+a[2]*b[2];
+const crs=(a,b)=>[a[1]*b[2]-a[2]*b[1], a[2]*b[0]-a[0]*b[2], a[0]*b[1]-a[1]*b[0]];
+const nrm=a=>Math.sqrt(dot(a,a));
+const nzr=a=>{const n=nrm(a); return n<1e-12?[0,0,0]:scl(a,1/n);};
+const dst=(a,b)=>nrm(sub(a,b));
+const D2R=Math.PI/180, R2D=180/Math.PI;
+
+// ---- Unit toggle (mm <-> inches) helpers ----
+const MM_PER_IN=25.4;
+function getMM(id){
+  const el=document.getElementById(id);
+  if(!el) return 0;
+  const v=parseFloat(el.value)||0;
+  return el.dataset.unit==='in' ? v*MM_PER_IN : v;
+}
+function writeMM(id, mmVal){
+  const el=document.getElementById(id);
+  if(!el) return;
+  if(el.dataset.unit==='in'){ el.value=(mmVal/MM_PER_IN).toFixed(4); }
+  else { el.value=mmVal.toFixed(2); }
+}
+function setTabUnit(det, btn, targetUnit){
+  det.querySelectorAll('input[data-len]').forEach(el=>{
+    const oldUnit=el.dataset.unit||'mm';
+    const curVal=parseFloat(el.value)||0;
+    const mm=oldUnit==='in' ? curVal*MM_PER_IN : curVal;
+    el.dataset.unit=targetUnit;
+    el.value = targetUnit==='in' ? (mm/MM_PER_IN).toFixed(4) : mm.toFixed(2);
+    const lab = el.parentElement ? el.parentElement.querySelector('label') : null;
+    if(lab){
+      lab.textContent = targetUnit==='in' ? lab.textContent.replace('(mm','(in') : lab.textContent.replace('(in','(mm');
+    }
+  });
+  det.dataset.unit=targetUnit;
+  if(btn) btn.textContent=targetUnit.toUpperCase();
+}
+const UNIT_TOGGLE_GROUPS=[];
+function initUnitToggles(){
+  document.querySelectorAll('details.group').forEach(det=>{
+    const btn=det.querySelector(':scope > summary > button.utoggle');
+    if(!btn) return;
+    const defaultUnit = btn.textContent.trim().toLowerCase()==='in' ? 'in' : 'mm';
+    det.dataset.unit=defaultUnit;
+    UNIT_TOGGLE_GROUPS.push({det,btn,defaultUnit});
+    btn.addEventListener('click', (e)=>{
+      e.preventDefault(); e.stopPropagation();
+      const target = det.dataset.unit==='in' ? 'mm' : 'in';
+      setTabUnit(det, btn, target);
+      recomputeAll();
+    });
+  });
+}
+function resetAllTabUnits(){
+  UNIT_TOGGLE_GROUPS.forEach(g=> setTabUnit(g.det, g.btn, g.defaultUnit));
+}
+
+function rotPtAxis(P, axisPoint, axisDir, ang){
+  const v=sub(P,axisPoint), c=Math.cos(ang), s=Math.sin(ang);
+  return add(axisPoint, add(scl(v,c), add(scl(crs(axisDir,v),s), scl(axisDir, dot(axisDir,v)*(1-c)))));
+}
+function rotVecAxis(v, axisDirUnit, ang){
+  const c=Math.cos(ang), s=Math.sin(ang);
+  return add(scl(v,c), add(scl(crs(axisDirUnit,v),s), scl(axisDirUnit, dot(axisDirUnit,v)*(1-c))));
+}
+function rotateAlign(v, a, b){
+  a=nzr(a); b=nzr(b);
+  const c=dot(a,b);
+  if(c>1-1e-10) return v;
+  if(c<-1+1e-10){
+    let perp = Math.abs(a[0])<0.9 ? [1,0,0] : [0,1,0];
+    const axis=nzr(crs(a,perp));
+    return rotVecAxis(v,axis,Math.PI);
+  }
+  const axis=nzr(crs(a,b));
+  const ang=Math.atan2(nrm(crs(a,b)),c);
+  return rotVecAxis(v,axis,ang);
+}
+
+const POINT_DEFS=[
+  {key:'UF', group:'Upper wishbone', label:'Front inboard pivot (uca_f)', d:[-200, 241.82, 181.526]},
+  {key:'UR', group:'Upper wishbone', label:'Rear inboard pivot (uca_r)', d:[-200, 196.52, -187.52]},
+  {key:'UBJ',group:'Upper wishbone', label:'Outboard ball joint (ubj)', d:[-547, 77.048, -13.284]},
+  {key:'LF', group:'Lower wishbone', label:'Front inboard pivot (lca_f)', d:[-200, 83.894, 182.518]},
+  {key:'LR', group:'Lower wishbone', label:'Rear inboard pivot (lca_r)', d:[-200, 38.1, -190.5]},
+  {key:'LBJ',group:'Lower wishbone', label:'Outboard ball joint (lbj)', d:[-569.93, -79.028, -2.474]},
+  {key:'TR_OUT',group:'Steering Rack & Tie Rod', label:'Steering knuckle link', d:[-569.9, 0, 57.99]},
+  {key:'TR_IN', group:'Steering Rack & Tie Rod', label:'Rack end', d:[-190.5, 166.45, 127]},
+  {key:'WC', group:'Wheel', label:'Wheel center', d:[-635, 0, 0]},
+];
+const AXES=['x','y','z'];
+
+function buildSidebar(){
+  const root=document.getElementById('pointGroups');
+  const groups=[...new Set(POINT_DEFS.map(p=>p.group))];
+  groups.forEach(g=>{
+    const det=document.createElement('details');
+    det.className='group'; det.open = (g==='Upper wishbone'||g==='Wheel');
+    const sum=document.createElement('summary');
+    sum.innerHTML=`<span>${g}</span><button type="button" class="tag utoggle" data-role="unit">MM</button>`;
+    det.appendChild(sum);
+    POINT_DEFS.filter(p=>p.group===g).forEach(p=>{
+      const blk=document.createElement('div'); blk.className='pt-block';
+      blk.innerHTML=`<div class="pt-label"><b>${p.key}</b> — ${p.label}</div>
+        <div class="xyz">
+          <div><label>X (right)</label><input type="number" step="1" id="in_${p.key}_x" value="${p.d[0]}" data-len="1" data-unit="mm"></div>
+          <div><label>Y (up)</label><input type="number" step="1" id="in_${p.key}_y" value="${p.d[1]}" data-len="1" data-unit="mm"></div>
+          <div><label>Z (fwd)</label><input type="number" step="1" id="in_${p.key}_z" value="${p.d[2]}" data-len="1" data-unit="mm"></div>
+        </div>`;
+      det.appendChild(blk);
+    });
+    root.appendChild(det);
+  });
+}
+buildSidebar();
+initUnitToggles();
+
+function readPoints(){
+  const HP={};
+  POINT_DEFS.forEach(p=>{
+    const xd=getMM(`in_${p.key}_x`); // right+
+    const yd=getMM(`in_${p.key}_y`); // up+
+    const zd=getMM(`in_${p.key}_z`); // forward+
+    HP[p.key]=[zd,-xd,yd]; // internal mapping: [forward, outboard(+away from centerline), up]
+  });
+  return HP;
+}
+
+// ---- Derived upright/steering geometry (raw ADAMS X-right,Y-up,Z-fwd coords) ----
+function readRawPoints(){
+  const RP={};
+  POINT_DEFS.forEach(p=>{
+    RP[p.key]={
+      x: getMM(`in_${p.key}_x`),
+      y: getMM(`in_${p.key}_y`),
+      z: getMM(`in_${p.key}_z`),
+    };
+  });
+  return RP;
+}
+const vsub=(a,b)=>({x:a.x-b.x,y:a.y-b.y,z:a.z-b.z});
+const vadd=(a,b)=>({x:a.x+b.x,y:a.y+b.y,z:a.z+b.z});
+const vscl=(a,s)=>({x:a.x*s,y:a.y*s,z:a.z*s});
+const vdot=(a,b)=>a.x*b.x+a.y*b.y+a.z*b.z;
+const vlen=a=>Math.sqrt(vdot(a,a));
+
+function computeDerived(RP){
+  const {UF,UR,LF,LR,UBJ,LBJ,TR_OUT,TR_IN,WC}=RP;
+  const uV=vsub(UBJ,LBJ);
+  const uprightLen=vlen(uV)||1e-6;
+  const ratioPct = 100*(UBJ.y-WC.y)/((UBJ.y-LBJ.y)||1e-6);
+  const kpi = Math.atan2(uV.x,uV.y)*R2D;
+  const caster = Math.atan2(-uV.z,uV.y)*R2D;
+
+  const tR = (WC.y-LBJ.y)/((UBJ.y-LBJ.y)||1e-6);
+  const Pr = {x:LBJ.x+tR*uV.x, y:WC.y, z:LBJ.z+tR*uV.z};
+  const spV = {x:WC.x-Pr.x, y:0, z:WC.z-Pr.z};
+  // Spindle length: perpendicular LATERAL (X) distance between wheel centre and the kingpin axis (upright).
+  const spindleLen = spV.x;
+  // Kingpin offset: perpendicular LONGITUDINAL (Z) distance between wheel centre and the kingpin axis (upright).
+  const kpOffsetLong = spV.z;
+
+  const spanU = vlen(vsub(UF,UR));
+  const spanL = vlen(vsub(LF,LR));
+  const recessU = Math.atan2(UF.y-UR.y, UF.z-UR.z)*R2D;
+  const recessL = Math.atan2(LF.y-LR.y, LF.z-LR.z)*R2D;
+
+  const kV = vsub(TR_OUT,LBJ);
+  const tK = vdot(kV,uV)/(vdot(uV,uV)||1e-6);
+  const Fk = vadd(LBJ, vscl(uV,tK));
+  const knV = vsub(TR_OUT,Fk);
+  const knuckleLen = Math.sqrt(knV.x*knV.x+knV.z*knV.z); // top-view (horizontal) length, consistent with knuckleAng
+  const knuckleAng = Math.atan2(knV.z, knV.x||1e-9)*R2D;
+  const knuckleDy = knV.y; // small vertical offset preserved as-is, not exposed as an editable field
+
+  const rackLen = 2*Math.abs(TR_IN.x);
+
+  return {uprightLen,ratioPct,spindleLen,kpi,caster,
+    spanU,spanL,recessU,recessL,
+    knuckleLen,knuckleAng,tK,knuckleDy,
+    rackLen, kpOffsetLong};
+}
+
+function rebuildFromDerived(RP, D, overrideKey, overrideVal){
+  const d = Object.assign({}, D);
+  d[overrideKey] = overrideVal;
+
+  const kR=d.kpi*D2R, cR=d.caster*D2R;
+  const dir = { x: Math.cos(cR)*Math.sin(kR), y: Math.cos(cR)*Math.cos(kR), z: -Math.sin(cR) };
+  const uV = vscl(dir, d.uprightLen);
+
+  const r = d.ratioPct/100;
+  // spindleLen = lateral (X) offset of WC from kingpin axis; kpOffsetLong = longitudinal (Z) offset (read-only, held fixed).
+  const Pr = { x: RP.WC.x - d.spindleLen, y: RP.WC.y, z: RP.WC.z - D.kpOffsetLong };
+  const UBJ = vadd(Pr, vscl(uV, r));
+  const LBJ = vsub(Pr, vscl(uV, 1-r));
+
+  const midU = { y:(RP.UF.y+RP.UR.y)/2, z:(RP.UF.z+RP.UR.z)/2 };
+  const dxU = RP.UF.x - RP.UR.x;
+  const planarU = Math.sqrt(Math.max(0, d.spanU*d.spanU - dxU*dxU))/2;
+  const angU = d.recessU*D2R;
+  const UF = { x: RP.UF.x, y: midU.y + planarU*Math.sin(angU), z: midU.z + planarU*Math.cos(angU) };
+  const UR = { x: RP.UR.x, y: midU.y - planarU*Math.sin(angU), z: midU.z - planarU*Math.cos(angU) };
+
+  const midL = { y:(RP.LF.y+RP.LR.y)/2, z:(RP.LF.z+RP.LR.z)/2 };
+  const dxL = RP.LF.x - RP.LR.x;
+  const planarL = Math.sqrt(Math.max(0, d.spanL*d.spanL - dxL*dxL))/2;
+  const angL = d.recessL*D2R;
+  const LF = { x: RP.LF.x, y: midL.y + planarL*Math.sin(angL), z: midL.z + planarL*Math.cos(angL) };
+  const LR = { x: RP.LR.x, y: midL.y - planarL*Math.sin(angL), z: midL.z - planarL*Math.cos(angL) };
+
+  const Fk = vadd(LBJ, vscl(uV, d.tK));
+  const knAng = d.knuckleAng*D2R;
+  const TR_OUT = { x: Fk.x + d.knuckleLen*Math.cos(knAng), y: Fk.y + (d.knuckleDy||0), z: Fk.z + d.knuckleLen*Math.sin(knAng) };
+
+  const signIn = Math.sign(RP.TR_IN.x)||1;
+  const TR_IN = { x: signIn*d.rackLen/2, y: RP.TR_IN.y, z: RP.TR_IN.z };
+
+  return { UF, UR, LF, LR, UBJ, LBJ, TR_OUT, TR_IN, WC: RP.WC };
+}
+
+function writeRawPoints(newPts){
+  Object.keys(newPts).forEach(key=>{
+    const p = newPts[key];
+    ['x','y','z'].forEach(ax=>{
+      writeMM(`in_${key}_${ax}`, p[ax]);
+    });
+  });
+}
+
+const DERIVED_FIELD_MAP = {uprightLen:'der_uprightLen', ratioPct:'der_ratioPct', spindleLen:'der_spindleLen',
+  kpi:'der_kpi', caster:'der_caster', spanU:'der_spanU', recessU:'der_recessU',
+  spanL:'der_spanL', recessL:'der_recessL', knuckleLen:'der_knuckleLen', knuckleAng:'der_knuckleAng',
+  rackLen:'der_rackLen'};
+let LAST_DERIVED=null;
+
+function refreshDerivedPanel(){
+  const RP = readRawPoints();
+  const D = computeDerived(RP);
+  Object.keys(DERIVED_FIELD_MAP).forEach(k=>{
+    const el = document.getElementById(DERIVED_FIELD_MAP[k]);
+    if(!el || document.activeElement===el) return;
+    if(el.dataset.len){ writeMM(DERIVED_FIELD_MAP[k], D[k]); }
+    else { el.value = D[k].toFixed(2); }
+  });
+  const kpLongEl = document.getElementById('der_kpOffsetLong');
+  if(kpLongEl && document.activeElement!==kpLongEl) writeMM('der_kpOffsetLong', D.kpOffsetLong);
+  LAST_DERIVED = D;
+}
+
+function onDerivedChange(key, elId){
+  const el = document.getElementById(elId);
+  const val = el.dataset.len ? getMM(elId) : parseFloat(el.value);
+  if(isNaN(val)) return;
+  const RP = readRawPoints();
+  const D = LAST_DERIVED || computeDerived(RP);
+  const newPts = rebuildFromDerived(RP, D, key, val);
+  writeRawPoints(newPts);
+  recomputeAll();
+}
+
+Object.keys(DERIVED_FIELD_MAP).forEach(key=>{
+  const elId = DERIVED_FIELD_MAP[key];
+  const el = document.getElementById(elId);
+  el.addEventListener('input', e=>e.stopPropagation());
+  el.addEventListener('change', e=>{ e.stopPropagation(); onDerivedChange(key, elId); });
+});
+
+function readSetup(){
+  return {
+    staticCamber: parseFloat(document.getElementById('in_staticCamber').value)||0,
+    staticToe: parseFloat(document.getElementById('in_staticToe').value)||0,
+    tireR: getMM('in_tireR')||292.1,
+    tireW: getMM('in_tireW')||180,
+    bumpLim: getMM('in_bumpLim')||152.4,
+    droopLim: getMM('in_droopLim')|| -101.6,
+    lockSteer: document.getElementById('in_lockSteer').checked,
+    flipCamber: document.getElementById('in_flipCamber').checked,
+    flipToe: document.getElementById('in_flipToe').checked,
+  };
+}
+
+function buildSolver(HP, setup){
+  const uAxisDir=nzr(sub(HP.UR,HP.UF));
+  const lAxisDir=nzr(sub(HP.LR,HP.LF));
+  const KL=dst(HP.UBJ,HP.LBJ);
+  const TRL=dst(HP.TR_OUT, HP.TR_IN);
+
+  const toeR=setup.staticToe*D2R, camR=setup.staticCamber*D2R;
+  let s0=[ -Math.sin(toeR), Math.cos(toeR), 0 ];
+  s0=[ s0[0], s0[1]*Math.cos(camR)-s0[2]*Math.sin(camR), s0[1]*Math.sin(camR)+s0[2]*Math.cos(camR) ];
+
+  const computeUBJ=(t)=>rotPtAxis(HP.UBJ,HP.UF,uAxisDir,t);
+  const computeLBJ=(t)=>rotPtAxis(HP.LBJ,HP.LF,lAxisDir,t);
+
+  function solveThetaU(thetaL, guess){
+    let x=guess;
+    for(let i=0;i<60;i++){
+      const U=computeUBJ(x), L=computeLBJ(thetaL);
+      const f0=dst(U,L)-KL;
+      if(Math.abs(f0)<1e-8) break;
+      const h=1e-6, f1=dst(computeUBJ(x+h),L)-KL;
+      const df=(f1-f0)/h;
+      if(Math.abs(df)<1e-10) break;
+      let dx=f0/df; dx=Math.max(-0.15,Math.min(0.15,dx));
+      x-=dx;
+    }
+    return x;
+  }
+
+  let prevThetaU=0, prevPhi=0, ok=true;
+
+  function solveAt(thetaL, rackOffsetOutboard = 0){
+    const L=computeLBJ(thetaL);
+    const thetaU=solveThetaU(thetaL, prevThetaU);
+    const U=computeUBJ(thetaU);
+    const residual=Math.abs(dst(U,L)-KL);
+    if(residual>0.5) ok=false;
+    prevThetaU=thetaU;
+
+    const d0=sub(HP.LBJ,HP.UBJ), d1=sub(L,U);
+    const kingUp=nzr(sub(U,L)); 
+
+    const w0=sub(HP.WC,HP.UBJ);
+    const tr0=sub(HP.TR_OUT, HP.UBJ);
+    
+    const w1=rotateAlign(w0,d0,d1);
+    const tr1=rotateAlign(tr0,d0,d1);
+    const s1_uns=rotateAlign(s0,d0,d1);
+    
+    const WC_uns=add(U,w1);
+    const TRO_uns=add(U,tr1);
+    
+    const TR_IN = [HP.TR_IN[0], HP.TR_IN[1] + rackOffsetOutboard, HP.TR_IN[2]];
+
+    let phi = prevPhi;
+    let s1 = s1_uns;
+    let TR_OUT = TRO_uns;
+    let WC = WC_uns;
+
+    if (!setup.lockSteer) {
+      let phiResidual = 0;
+      for(let i=0; i<30; i++){
+        const tro_test = rotPtAxis(TRO_uns, U, kingUp, phi);
+        const f0 = dst(tro_test, TR_IN) - TRL;
+        phiResidual = Math.abs(f0);
+        if(phiResidual < 1e-8) break;
+        const h = 1e-6;
+        const f1 = dst(rotPtAxis(TRO_uns, U, kingUp, phi+h), TR_IN) - TRL;
+        const df = (f1 - f0)/h;
+        if(Math.abs(df) < 1e-10) break;
+        let dPhi = f0/df; 
+        dPhi = Math.max(-0.15, Math.min(0.15, dPhi)); 
+        phi -= dPhi;
+      }
+      // Tie-rod length constraint must also converge — previously only the wishbone/ball-joint
+      // residual was checked, so an unreachable steer/tie-rod geometry (common near full rack
+      // travel) silently returned a garbage phi, producing wildly exaggerated camber on one wheel.
+      if(phiResidual > 0.5) ok = false;
+      prevPhi = phi;
+      TR_OUT = rotPtAxis(TRO_uns, U, kingUp, phi);
+      WC = rotPtAxis(WC_uns, U, kingUp, phi);
+      s1 = rotVecAxis(s1_uns, kingUp, phi);
+    }
+
+    let rawCamber = Math.atan2(s1[2],s1[1])*R2D;
+    const camber = -rawCamber; 
+
+    const toe=Math.atan2(-s1[0],s1[1])*R2D;
+    const kpi=Math.atan2(-kingUp[1],kingUp[2])*R2D;
+    const caster=Math.atan2(-kingUp[0],kingUp[2])*R2D;
+    const travel=WC[2]-HP.WC[2];
+
+    const t_gnd = (WC[2] - setup.tireR - L[2]) / (kingUp[2] || 1e-5);
+    const kp_gnd_outboard = L[1] + t_gnd * kingUp[1];
+    const scrub = WC[1] - kp_gnd_outboard;
+    const kp_gnd_forward = L[0] + t_gnd * kingUp[0];
+    const trail = kp_gnd_forward - WC[0]; // + = kingpin-axis ground point leads (is ahead of) the wheel centre — self-centring (standard positive mechanical trail)
+
+    return {thetaU,U,L,WC,TR_OUT,TR_IN,camber,toe,kpi,caster,travel,scrub,trail,ok};
+  }
+  return {solveAt, KL, get ok(){return ok;}};
+}
+
+let TABLE=[]; let CUR=null; let HP_CUR=null; let SETUP_CUR=null;
+
+function solveRobust(HP, setup, targetRackShift, targetThetaL) {
+  const solver = buildSolver(HP, setup);
+  let res;
+  
+  const rackSteps = Math.max(1, Math.ceil(Math.abs(targetRackShift) / 2)); 
+  for (let i = 0; i <= rackSteps; i++) {
+     res = solver.solveAt(0, targetRackShift * (i / rackSteps));
+     if (!res.ok) return res;
+  }
+
+  if (Math.abs(targetThetaL) < 1e-6) return res;
+
+  const bumpSteps = Math.max(1, Math.ceil(Math.abs(targetThetaL) / (0.1 * D2R))); 
+  for (let i = 1; i <= bumpSteps; i++) {
+    res = solver.solveAt(targetThetaL * (i / bumpSteps), targetRackShift);
+    if (!res.ok) break;
+  }
+  return res;
+}
+
+function recomputeAll(){
+  refreshDerivedPanel();
+  const HP=readPoints(), setup=readSetup();
+  HP_CUR=HP; SETUP_CUR=setup;
+  
+  const rack_shift_mm = parseFloat(document.getElementById('rackSlider').value) * 25.4;
+
+  const solverNeg=buildSolver(HP, setup);
+  const solverPos=buildSolver(HP, setup);
+  
+  const rackSteps = Math.max(1, Math.ceil(Math.abs(rack_shift_mm) / 5));
+  let r0;
+  for(let i=0; i<=rackSteps; i++) {
+      let curR = -rack_shift_mm * (i/rackSteps); 
+      r0 = solverPos.solveAt(0, curR);
+      solverNeg.solveAt(0, curR);
+  }
+
+  const rows=[];
+  if(solverPos.ok && isFinite(r0.travel)) rows.push({thetaL:0, ...r0});
+
+  for(let td=0.2; td<=30; td+=0.2){
+    const r=solverPos.solveAt(td*D2R, -rack_shift_mm);
+    if(!solverPos.ok || !isFinite(r.travel)) break;
+    rows.push({thetaL:td, ...r});
+  }
+  for(let td=-0.2; td>=-30; td-=0.2){
+    const r=solverNeg.solveAt(td*D2R, -rack_shift_mm);
+    if(!solverNeg.ok || !isFinite(r.travel)) break;
+    rows.unshift({thetaL:td, ...r});
+  }
+  TABLE=rows;
+  document.getElementById('warnBox').textContent = TABLE.length<50 ? 'Geometry did not converge over a useful travel range — check hardpoints for degenerate/parallel wishbone axes.' : '';
+
+  if(!TABLE.length) return;
+
+  const travels=TABLE.map(r=>r.travel);
+  const minTravel=Math.min(...travels), maxTravel=Math.max(...travels);
+  const bumpLim=Math.min(setup.bumpLim, maxTravel);
+  const droopLim=Math.max(setup.droopLim, minTravel);
+
+  const slider=document.getElementById('travelSlider');
+  const prevVal=parseFloat(slider.value);
+  slider.min=droopLim.toFixed(1); slider.max=bumpLim.toFixed(1);
+  if(prevVal<droopLim||prevVal>bumpLim||isNaN(prevVal)) slider.value=Math.max(droopLim,Math.min(bumpLim,0));
+  document.getElementById('droopLabel').textContent='DROOP '+droopLim.toFixed(0);
+  document.getElementById('bumpLabel').textContent='BUMP +'+bumpLim.toFixed(0);
+
+  updateAtSlider();
+  drawCharts(droopLim,bumpLim);
+}
+
+function nearestRow(travelTarget){
+  let best=TABLE[0], bd=Infinity;
+  for(const r of TABLE){ const d=Math.abs(r.travel-travelTarget); if(d<bd){bd=d;best=r;} }
+  return best;
+}
+
+function updateAtSlider(){
+  if(!TABLE.length) return;
+  const target=parseFloat(document.getElementById('travelSlider').value);
+  CUR=nearestRow(target);
+  document.getElementById('travelVal').textContent = CUR.travel.toFixed(1)+' mm';
+  
+  const rack_shift_mm = parseFloat(document.getElementById('rackSlider').value) * 25.4;
+  document.getElementById('rackVal').textContent = (rack_shift_mm / 25.4).toFixed(2) + ' in';
+
+  const setup=SETUP_CUR;
+  const targetThetaL_R = CUR.thetaL * D2R;
+  
+  const res_R = solveRobust(HP_CUR, setup, rack_shift_mm, targetThetaL_R);
+
+  const camber = CUR.camber * (setup.flipCamber?-1:1);
+  const toe = CUR.toe * (setup.flipToe?-1:1);
+  const camber_R = res_R.ok ? (res_R.camber * (setup.flipCamber?-1:1)) : -camber;
+  const toe_R = res_R.ok ? (res_R.toe * (setup.flipToe?-1:1)) : -toe;
+
+  document.getElementById('out_camber').innerHTML = camber.toFixed(2)+'<span class="unit">&deg;</span>';
+  document.getElementById('out_camber_r').innerHTML = camber_R.toFixed(2)+'<span class="unit">&deg; R</span>';
+  document.getElementById('out_toe').innerHTML = toe.toFixed(2)+'<span class="unit">&deg;</span>';
+  document.getElementById('out_toe_r').innerHTML = toe_R.toFixed(2)+'<span class="unit">&deg; R</span>';
+  document.getElementById('out_caster').innerHTML = CUR.caster.toFixed(2)+'<span class="unit">&deg;</span>';
+  document.getElementById('out_kpi').innerHTML = CUR.kpi.toFixed(2)+'<span class="unit">&deg;</span>';
+  const trackMm = 2*Math.abs(CUR.WC[1]); // live, solved wheel-centre position — changes with bump travel & steer, not the static input
+  document.getElementById('out_track').innerHTML = Math.round(trackMm)+'<span class="unit">mm</span> <span class="unit">('+(trackMm/25.4).toFixed(2)+' in)</span>';
+  
+  let ita = 0, ota = 0, ack = 0;
+  if (Math.abs(rack_shift_mm) > 0.1) {
+      const res_base_L = solveRobust(HP_CUR, setup, 0, CUR.thetaL * D2R);
+      const res_base_R = solveRobust(HP_CUR, setup, 0, targetThetaL_R);
+      
+      if (res_base_L.ok && res_R.ok && res_base_R.ok) {
+          const rawToe_L_turn = CUR.toe;
+          const rawToe_R_turn = res_R.toe;
+          const rawToe_L_base = res_base_L.toe;
+          const rawToe_R_base = res_base_R.toe;
+
+          const delta_L = rawToe_L_turn - rawToe_L_base;
+          const delta_R = rawToe_R_turn - rawToe_R_base;
+
+          const sign_L = Math.sign(delta_L);
+          const sign_R = Math.sign(delta_R);
+
+          const total_turn = delta_L + delta_R;
+
+          if (total_turn > 0) { 
+              ita = Math.abs(delta_R); 
+              ota = Math.abs(delta_L);
+          } else { 
+              ita = Math.abs(delta_L); 
+              ota = Math.abs(delta_R);
+          }
+
+          const L = getMM('in_wheelbaseIn');
+          const T = getMM('in_trackIn');
+          // Ideal (theoretical) inner-wheel angle for the measured outer angle:
+          //   cot(AckValue) = cot(ota) - T/L   =>   AckValue = atan( L / (L/tan(ota) - T) )
+          // Ackermann % = measured inner angle / ideal inner angle * 100
+          if (ota > 0.1) {
+              const denom = L / Math.tan(ota * D2R) - T;
+              if (Math.abs(denom) > 1e-6) {
+                  const ackValue = Math.atan(L / denom) * R2D;
+                  if (Math.abs(ackValue) > 1e-6) ack = (ita / ackValue) * 100;
+              }
+          }
+      }
+  }
+  
+  document.getElementById('out_ita').innerHTML = ita.toFixed(2) + '<span class="unit">&deg;</span>';
+  document.getElementById('out_ota').innerHTML = ota.toFixed(2) + '<span class="unit">&deg;</span>';
+  document.getElementById('out_ack').innerHTML = ack.toFixed(1) + '<span class="unit">%</span>';
+  document.getElementById('out_scrub').innerHTML = (CUR.scrub || 0).toFixed(1) + '<span class="unit">mm</span>';
+  document.getElementById('out_trail').innerHTML = (CUR.trail || 0).toFixed(1) + '<span class="unit">mm</span>';
+
+  const trackField=document.getElementById('in_trackIn');
+  if(document.activeElement!==trackField) writeMM('in_trackIn', trackMm);
+
+  const bar=(id,v,range)=>{ const el=document.getElementById(id); const pct=Math.max(0,Math.min(100,50+ (v/range)*50)); el.style.width=pct+'%'; };
+  bar('bar_camber',camber,6);
+  bar('bar_toe',toe,6);
+
+  drawViews(camber,toe,rack_shift_mm);
+  markChartPoint();
+}
+
+function fitBox(pts, pad){
+  let minA=Infinity,maxA=-Infinity,minB=Infinity,maxB=-Infinity;
+  pts.forEach(([a,b])=>{minA=Math.min(minA,a);maxA=Math.max(maxA,a);minB=Math.min(minB,b);maxB=Math.max(maxB,b);});
+  minA-=pad;maxA+=pad;minB-=pad;maxB+=pad;
+  return {minA,maxA,minB,maxB};
+}
+function mapper(box, w, h, flipB){
+  const spanA=box.maxA-box.minA||1, spanB=box.maxB-box.minB||1;
+  const scale=Math.min(w/spanA, h/spanB);
+  const offA=(w-spanA*scale)/2, offB=(h-spanB*scale)/2;
+  return (a,b)=>{
+    const x=offA+(a-box.minA)*scale;
+    let y=offB+(b-box.minB)*scale;
+    if(flipB) y=h-y;
+    return [x,y];
+  };
+}
+function svgEl(tag,attrs){
+  const el=document.createElementNS('http://www.w3.org/2000/svg',tag);
+  for(const k in attrs) el.setAttribute(k,attrs[k]);
+  return el;
+}
+function line(m,p1,p2,color,w,dash){
+  const [x1,y1]=m(...p1), [x2,y2]=m(...p2);
+  return svgEl('line',{x1,y1,x2,y2,stroke:color,'stroke-width':w||1.5,'stroke-dasharray':dash||'','stroke-linecap':'round'});
+}
+function dotMark(m,p,color,r){
+  const [x,y]=m(...p);
+  return svgEl('circle',{cx:x,cy:y,r:r||3,fill:color});
+}
+
+// ============================================================
+// 3D ROTATABLE VIEW (three.js) — mirrors the same solved points
+// used by the 2D orthographic panels above, but as a single
+// live, orbit/zoom/pan-able scene.
+// ============================================================
+let THREE3D = null;
+const ORBIT3D = { theta: 0.85, phi: 1.15, radius: 2100, target: null };
+let SHOW_BOTH_SIDES_3D = true;
+
+function w3L(p){ return new THREE.Vector3(p[0], p[2], -p[1]); }
+function w3R(p){ return new THREE.Vector3(p[0], p[2],  p[1]); }
+
+function spinAxis3(camberDeg, toeDeg, side){
+  const th = camberDeg*D2R, ph = toeDeg*D2R, s = (side==='L') ? -1 : 1;
+  return new THREE.Vector3(
+    s*Math.cos(th)*Math.sin(ph),
+    -s*Math.sin(th),
+    s*Math.cos(th)*Math.cos(ph)
+  ).normalize();
+}
+
+function init3D(){
+  const canvas=document.getElementById('canvas3D');
+  if(!canvas) return false;
+  if(typeof THREE==='undefined'){
+    const wrap=document.getElementById('view3dContainer');
+    if(wrap && !document.getElementById('view3dErr')){
+      const msg=document.createElement('div');
+      msg.id='view3dErr';
+      msg.style.cssText='position:absolute;inset:0;display:flex;align-items:center;justify-content:center;text-align:center;padding:20px;font-family:var(--mono);font-size:11.5px;color:var(--red);';
+      msg.textContent='3D engine (three.js) failed to load from CDN — check your network connection and reload.';
+      wrap.appendChild(msg);
+    }
+    return false;
+  }
+  const renderer=new THREE.WebGLRenderer({canvas, antialias:true, alpha:true});
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio||1, 2));
+  const scene=new THREE.Scene();
+  const camera=new THREE.PerspectiveCamera(38, 1, 10, 30000);
+  const group=new THREE.Group();
+  scene.add(group);
+  scene.add(new THREE.AmbientLight(0xffffff, 0.95));
+  const dl=new THREE.DirectionalLight(0xffffff, 0.55);
+  dl.position.set(500, 900, 700);
+  scene.add(dl);
+
+  ORBIT3D.target = new THREE.Vector3(0, 0, 0);
+  THREE3D = { renderer, scene, camera, group, objects:{} };
+  setupOrbit3D(canvas);
+  window.addEventListener('resize', resize3D);
+  resize3D();
+  updateCameraFromOrbit3D();
+  return true;
+}
+
+function resize3D(){
+  if(!THREE3D) return;
+  const wrap=document.getElementById('view3dContainer');
+  if(!wrap) return;
+  const w=wrap.clientWidth, h=wrap.clientHeight;
+  if(w<10||h<10) return;
+  THREE3D.renderer.setSize(w,h,false);
+  THREE3D.camera.aspect=w/h;
+  THREE3D.camera.updateProjectionMatrix();
+  render3D();
+}
+
+function updateCameraFromOrbit3D(){
+  if(!THREE3D) return;
+  const {theta,phi,radius,target}=ORBIT3D;
+  const x = target.x + radius*Math.sin(phi)*Math.sin(theta);
+  const y = target.y + radius*Math.cos(phi);
+  const z = target.z + radius*Math.sin(phi)*Math.cos(theta);
+  THREE3D.camera.position.set(x,y,z);
+  THREE3D.camera.lookAt(target);
+}
+
+function render3D(){
+  if(!THREE3D) return;
+  THREE3D.renderer.render(THREE3D.scene, THREE3D.camera);
+}
+
+function setupOrbit3D(canvas){
+  let dragging=false, panning=false, lastX=0, lastY=0;
+  canvas.addEventListener('contextmenu', e=>e.preventDefault());
+  canvas.addEventListener('pointerdown', e=>{
+    canvas.setPointerCapture(e.pointerId);
+    if(e.button===2 || e.shiftKey){ panning=true; } else { dragging=true; }
+    lastX=e.clientX; lastY=e.clientY;
+  });
+  canvas.addEventListener('pointermove', e=>{
+    if(!dragging && !panning) return;
+    const dx=e.clientX-lastX, dy=e.clientY-lastY;
+    lastX=e.clientX; lastY=e.clientY;
+    if(dragging){
+      ORBIT3D.theta -= dx*0.0065;
+      ORBIT3D.phi = Math.max(0.06, Math.min(Math.PI-0.06, ORBIT3D.phi - dy*0.0065));
+      updateCameraFromOrbit3D();
+    } else if(panning){
+      panCamera3D(dx,dy);
+      updateCameraFromOrbit3D();
+    }
+    render3D();
+  });
+  const endDrag=()=>{dragging=false; panning=false;};
+  canvas.addEventListener('pointerup', endDrag);
+  canvas.addEventListener('pointerleave', endDrag);
+  canvas.addEventListener('wheel', e=>{
+    e.preventDefault();
+    ORBIT3D.radius *= (1 + (e.deltaY>0 ? 0.12 : -0.12));
+    ORBIT3D.radius = Math.max(250, Math.min(9000, ORBIT3D.radius));
+    updateCameraFromOrbit3D();
+    render3D();
+  }, {passive:false});
+}
+
+function panCamera3D(dx,dy){
+  const cam=THREE3D.camera;
+  const forward=new THREE.Vector3().subVectors(ORBIT3D.target, cam.position).normalize();
+  const right=new THREE.Vector3().crossVectors(forward, cam.up).normalize();
+  const up=new THREE.Vector3().crossVectors(right, forward).normalize();
+  const scale=ORBIT3D.radius*0.0015;
+  ORBIT3D.target.addScaledVector(right, -dx*scale).addScaledVector(up, dy*scale);
+}
+
+function line3(key,color){
+  if(!THREE3D.objects[key]){
+    const geo=new THREE.BufferGeometry();
+    geo.setAttribute('position', new THREE.BufferAttribute(new Float32Array(6),3));
+    const mat=new THREE.LineBasicMaterial({color:new THREE.Color(color)});
+    const obj=new THREE.Line(geo,mat);
+    THREE3D.group.add(obj);
+    THREE3D.objects[key]=obj;
+  }
+  return THREE3D.objects[key];
+}
+function setLine3(key,p1,p2,color){
+  const obj=line3(key,color);
+  obj.visible=true;
+  const pos=obj.geometry.attributes.position.array;
+  pos[0]=p1.x;pos[1]=p1.y;pos[2]=p1.z;
+  pos[3]=p2.x;pos[4]=p2.y;pos[5]=p2.z;
+  obj.geometry.attributes.position.needsUpdate=true;
+  obj.geometry.computeBoundingSphere();
+}
+function dot3(key,p,color,r){
+  if(!THREE3D.objects[key]){
+    const geo=new THREE.SphereGeometry(r||7,14,10);
+    const mat=new THREE.MeshBasicMaterial({color:new THREE.Color(color)});
+    const obj=new THREE.Mesh(geo,mat);
+    THREE3D.group.add(obj);
+    THREE3D.objects[key]=obj;
+  }
+  const obj=THREE3D.objects[key];
+  obj.visible=true;
+  obj.position.copy(p);
+}
+function hide3(key){
+  const obj=THREE3D.objects[key];
+  if(obj) obj.visible=false;
+}
+
+function wheelMesh3(key, color, setup){
+  let mesh=THREE3D.objects[key];
+  const needNew = !mesh || mesh.userData.tireR!==setup.tireR || mesh.userData.tireW!==setup.tireW;
+  if(needNew){
+    if(mesh){
+      THREE3D.group.remove(mesh);
+      mesh.geometry.dispose(); mesh.material.dispose();
+      mesh.children.forEach(c=>{c.geometry.dispose(); c.material.dispose();});
+    }
+    const geo=new THREE.CylinderGeometry(setup.tireR, setup.tireR, setup.tireW, 28, 1, true);
+    const mat=new THREE.MeshBasicMaterial({color:new THREE.Color(color), transparent:true, opacity:0.14, side:THREE.DoubleSide, depthWrite:false});
+    mesh=new THREE.Mesh(geo,mat);
+    const edges=new THREE.LineSegments(new THREE.EdgesGeometry(geo,25), new THREE.LineBasicMaterial({color:new THREE.Color(color)}));
+    mesh.add(edges);
+    mesh.userData.tireR=setup.tireR; mesh.userData.tireW=setup.tireW;
+    THREE3D.group.add(mesh);
+    THREE3D.objects[key]=mesh;
+  }
+  mesh.visible=true;
+  return mesh;
+}
+function updateWheel3(key, center, axis, setup, color){
+  const mesh=wheelMesh3(key, color, setup);
+  mesh.position.copy(center);
+  mesh.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0), axis);
+}
+
+function ensureGround3(setup){
+  if(THREE3D.objects['ground']) return;
+  const grid=new THREE.GridHelper(3400, 24, 0x2C3540, 0x1A2027);
+  grid.position.set(0, -(setup.tireR||292), 0);
+  THREE3D.group.add(grid);
+  THREE3D.objects['ground']=grid;
+}
+
+function draw3D(ctx){
+  if(!THREE3D){ if(!init3D()) return; }
+  const {HP,setup,U,L,WC,TR_OUT,TR_IN_L,U_R,L_R,WC_R,TR_OUT_R,TR_IN_R,M,M_R,camber,cam_R,toe,toe_R}=ctx;
+  const AMBER='#FFB020', CYAN='#4FD8E8', MAGENTA='#FF4FD1', LIME='#C9FF3D';
+
+  setLine3('L_uf', w3L(HP.UF), w3L(U), AMBER);
+  setLine3('L_ur', w3L(HP.UR), w3L(U), AMBER);
+  setLine3('L_lf', w3L(HP.LF), w3L(L), CYAN);
+  setLine3('L_lr', w3L(HP.LR), w3L(L), CYAN);
+  setLine3('L_kp', w3L(U), w3L(L), LIME);
+  setLine3('L_upM_wc', w3L(M), w3L(WC), LIME);
+  setLine3('L_upM_tr', w3L(M), w3L(TR_OUT), LIME);
+  setLine3('L_tierod', w3L(TR_IN_L), w3L(TR_OUT), MAGENTA);
+  dot3('L_U', w3L(U), AMBER, 7);
+  dot3('L_L', w3L(L), CYAN, 7);
+  dot3('L_WC', w3L(WC), LIME, 7);
+  dot3('L_TRIN', w3L(TR_IN_L), MAGENTA, 6);
+  dot3('L_TROUT', w3L(TR_OUT), MAGENTA, 6);
+  updateWheel3('L_wheel', w3L(WC), spinAxis3(camber,toe,'L'), setup, LIME);
+
+  const showR = SHOW_BOTH_SIDES_3D;
+  ['R_uf','R_ur','R_lf','R_lr','R_kp','R_upM_wc','R_upM_tr','R_tierod','R_U','R_L','R_WC','R_TRIN','R_TROUT','R_wheel','rack'].forEach(k=>{ if(!showR) hide3(k); });
+  if(showR){
+    setLine3('R_uf', w3R(HP.UF), w3R(U_R), AMBER);
+    setLine3('R_ur', w3R(HP.UR), w3R(U_R), AMBER);
+    setLine3('R_lf', w3R(HP.LF), w3R(L_R), CYAN);
+    setLine3('R_lr', w3R(HP.LR), w3R(L_R), CYAN);
+    setLine3('R_kp', w3R(U_R), w3R(L_R), LIME);
+    setLine3('R_upM_wc', w3R(M_R), w3R(WC_R), LIME);
+    setLine3('R_upM_tr', w3R(M_R), w3R(TR_OUT_R), LIME);
+    setLine3('R_tierod', w3R(TR_IN_R), w3R(TR_OUT_R), MAGENTA);
+    dot3('R_U', w3R(U_R), AMBER, 7);
+    dot3('R_L', w3R(L_R), CYAN, 7);
+    dot3('R_WC', w3R(WC_R), LIME, 7);
+    dot3('R_TRIN', w3R(TR_IN_R), MAGENTA, 6);
+    dot3('R_TROUT', w3R(TR_OUT_R), MAGENTA, 6);
+    updateWheel3('R_wheel', w3R(WC_R), spinAxis3(cam_R,toe_R,'R'), setup, LIME);
+    setLine3('rack', w3L(TR_IN_L), w3R(TR_IN_R), MAGENTA);
+  }
+
+  ensureGround3(setup);
+  render3D();
+}
+
+function setOrbit3D(theta,phi,radius){
+  ORBIT3D.theta=theta; ORBIT3D.phi=phi; ORBIT3D.radius=radius;
+  if(ORBIT3D.target) ORBIT3D.target.set(0,0,0);
+  updateCameraFromOrbit3D();
+  render3D();
+}
+document.getElementById('btn3dIso')?.addEventListener('click', ()=>setOrbit3D(0.85,1.15,2100));
+document.getElementById('btn3dFront')?.addEventListener('click', ()=>setOrbit3D(0.001,Math.PI/2,2000));
+document.getElementById('btn3dTop')?.addEventListener('click', ()=>setOrbit3D(0.001,0.08,2400));
+document.getElementById('btn3dSide')?.addEventListener('click', ()=>setOrbit3D(Math.PI/2,Math.PI/2,2000));
+document.getElementById('btn3dReset')?.addEventListener('click', ()=>setOrbit3D(0.85,1.15,2100));
+document.getElementById('btn3dBoth')?.addEventListener('click', (e)=>{
+  SHOW_BOTH_SIDES_3D=!SHOW_BOTH_SIDES_3D;
+  e.target.classList.toggle('on', SHOW_BOTH_SIDES_3D);
+  if(CUR) recomputeAll();
+});
+
+function drawViews(camber,toe,rackShiftMm){
+  const HP=HP_CUR, setup=SETUP_CUR;
+  const U=CUR.U, L=CUR.L, WC=CUR.WC, TR_OUT=CUR.TR_OUT;
+  const TR_IN_L=CUR.TR_IN;
+  const M = [(U[0]+L[0])/2, (U[1]+L[1])/2, (U[2]+L[2])/2]; 
+  
+  const dX=p=>-p[1], dY=p=>p[2], dZ=p=>p[0];
+  const dX_R=p=>p[1], dY_R=p=>p[2], dZ_R=p=>p[0];
+
+  const targetThetaL_R = CUR.thetaL * D2R;
+  const resRight = solveRobust(HP_CUR, SETUP_CUR, rackShiftMm, targetThetaL_R);
+
+  const U_R = resRight.ok ? resRight.U : U;
+  const L_R = resRight.ok ? resRight.L : L;
+  const WC_R = resRight.ok ? resRight.WC : WC;
+  const TR_OUT_R = resRight.ok ? resRight.TR_OUT : TR_OUT;
+  const TR_IN_R = resRight.ok ? resRight.TR_IN : [HP.TR_IN[0], HP.TR_IN[1] + rackShiftMm, HP.TR_IN[2]]; 
+  const M_R = [(U_R[0]+L_R[0])/2, (U_R[1]+L_R[1])/2, (U_R[2]+L_R[2])/2];
+  
+  const cam_R = resRight.ok ? (resRight.camber * (setup.flipCamber?-1:1)) : -camber;
+  const toe_R = resRight.ok ? (resRight.toe * (setup.flipToe?-1:1)) : -toe;
+
+  draw3D({HP,setup,U,L,WC,TR_OUT,TR_IN_L,U_R,L_R,WC_R,TR_OUT_R,TR_IN_R,M,M_R,camber,cam_R,toe,toe_R});
+
+  // FRONT VIEW
+  {
+    const svg=document.getElementById('svgFront'); svg.innerHTML='';
+    const w=300,h=260, R=setup.tireR;
+    const camR_L = camber * D2R;
+    const wTop_L = [dX(WC) - R*Math.sin(camR_L), dY(WC) + R*Math.cos(camR_L)];
+    const wBot_L = [dX(WC) + R*Math.sin(camR_L), dY(WC) - R*Math.cos(camR_L)];
+    const camR_R = cam_R * D2R;
+    const wTop_R = [dX_R(WC_R) + R*Math.sin(camR_R), dY_R(WC_R) + R*Math.cos(camR_R)];
+    const wBot_R = [dX_R(WC_R) - R*Math.sin(camR_R), dY_R(WC_R) - R*Math.cos(camR_R)];
+
+    const pts=[
+      [dX(HP.UF),dY(HP.UF)],[dX(HP.UR),dY(HP.UR)],[dX(U),dY(U)],[dX(HP.LF),dY(HP.LF)],[dX(HP.LR),dY(HP.LR)],[dX(L),dY(L)],[dX(WC),dY(WC)],[dX(TR_IN_L),dY(TR_IN_L)],[dX(TR_OUT),dY(TR_OUT)], wTop_L, wBot_L,
+      [dX_R(HP.UF),dY_R(HP.UF)],[dX_R(HP.UR),dY_R(HP.UR)],[dX_R(U_R),dY_R(U_R)],[dX_R(HP.LF),dY_R(HP.LF)],[dX_R(HP.LR),dY_R(HP.LR)],[dX_R(L_R),dY_R(L_R)],[dX_R(WC_R),dY_R(WC_R)],[dX_R(TR_IN_R),dY_R(TR_IN_R)],[dX_R(TR_OUT_R),dY_R(TR_OUT_R)], wTop_R, wBot_R,
+      [0,0]
+    ];
+    const box=fitBox(pts,60);
+    const m=mapper(box,w,h,true);
+    
+    svg.appendChild(line(m,[box.minA,0],[box.maxA,0],'#232A32',1));
+    svg.appendChild(line(m,[0,box.minB],[0,box.maxB],'#232A32',1,'3,3'));
+    
+    svg.appendChild(line(m,[dX(TR_IN_L),dY(TR_IN_L)],[dX_R(TR_IN_R),dY_R(TR_IN_R)],'#FF4FD1',3));
+    
+    svg.appendChild(line(m,[dX(TR_IN_L),dY(TR_IN_L)],[dX(TR_OUT),dY(TR_OUT)],'#FF4FD1',2.5));
+    svg.appendChild(dotMark(m,[dX(TR_IN_L),dY(TR_IN_L)],'#FF4FD1',3));
+    svg.appendChild(line(m,[dX(HP.UF),dY(HP.UF)],[dX(U),dY(U)],'#FFB020',2.5));
+    svg.appendChild(line(m,[dX(HP.UR),dY(HP.UR)],[dX(U),dY(U)],'#FFB020',2.5));
+    svg.appendChild(line(m,[dX(HP.LF),dY(HP.LF)],[dX(L),dY(L)],'#4FD8E8',2.5));
+    svg.appendChild(line(m,[dX(HP.LR),dY(HP.LR)],[dX(L),dY(L)],'#4FD8E8',2.5));
+    svg.appendChild(line(m,[dX(U),dY(U)],[dX(L),dY(L)],'#C9FF3D',2.5));
+    svg.appendChild(line(m,[dX(M),dY(M)],[dX(WC),dY(WC)],'#C9FF3D',2.5));
+    svg.appendChild(line(m,[dX(M),dY(M)],[dX(TR_OUT),dY(TR_OUT)],'#C9FF3D',2.5));
+    svg.appendChild(dotMark(m,[dX(TR_OUT),dY(TR_OUT)],'#FF4FD1',3));
+    svg.appendChild(line(m,wBot_L,wTop_L,'#C9FF3D',4));
+    svg.appendChild(dotMark(m,[dX(WC),dY(WC)],'#C9FF3D',3));
+    svg.appendChild(dotMark(m,[dX(U),dY(U)],'#FFB020',3));
+    svg.appendChild(dotMark(m,[dX(L),dY(L)],'#4FD8E8',3));
+
+    svg.appendChild(line(m,[dX_R(TR_IN_R),dY_R(TR_IN_R)],[dX_R(TR_OUT_R),dY_R(TR_OUT_R)],'#FF4FD1',2.5));
+    svg.appendChild(dotMark(m,[dX_R(TR_IN_R),dY_R(TR_IN_R)],'#FF4FD1',3));
+    svg.appendChild(line(m,[dX_R(HP.UF),dY_R(HP.UF)],[dX_R(U_R),dY_R(U_R)],'#FFB020',2.5));
+    svg.appendChild(line(m,[dX_R(HP.UR),dY_R(HP.UR)],[dX_R(U_R),dY_R(U_R)],'#FFB020',2.5));
+    svg.appendChild(line(m,[dX_R(HP.LF),dY_R(HP.LF)],[dX_R(L_R),dY_R(L_R)],'#4FD8E8',2.5));
+    svg.appendChild(line(m,[dX_R(HP.LR),dY_R(HP.LR)],[dX_R(L_R),dY_R(L_R)],'#4FD8E8',2.5));
+    svg.appendChild(line(m,[dX_R(U_R),dY_R(U_R)],[dX_R(L_R),dY_R(L_R)],'#C9FF3D',2.5));
+    svg.appendChild(line(m,[dX_R(M_R),dY_R(M_R)],[dX_R(WC_R),dY_R(WC_R)],'#C9FF3D',2.5));
+    svg.appendChild(line(m,[dX_R(M_R),dY_R(M_R)],[dX_R(TR_OUT_R),dY_R(TR_OUT_R)],'#C9FF3D',2.5));
+    svg.appendChild(dotMark(m,[dX_R(TR_OUT_R),dY_R(TR_OUT_R)],'#FF4FD1',3));
+    svg.appendChild(line(m,wBot_R,wTop_R,'#C9FF3D',4));
+    svg.appendChild(dotMark(m,[dX_R(WC_R),dY_R(WC_R)],'#C9FF3D',3));
+    svg.appendChild(dotMark(m,[dX_R(U_R),dY_R(U_R)],'#FFB020',3));
+    svg.appendChild(dotMark(m,[dX_R(L_R),dY_R(L_R)],'#4FD8E8',3));
+
+    svg.setAttribute('viewBox',`0 0 ${w} ${h}`);
+  }
+  
+  // TOP VIEW
+  {
+    const svg=document.getElementById('svgTop'); svg.innerHTML='';
+    const w=300,h=260, R=setup.tireR;
+    const toeR_L = toe * D2R; 
+    const wFront_L = [dX(WC) + R*Math.sin(toeR_L), dZ(WC) + R*Math.cos(toeR_L)];
+    const wRear_L  = [dX(WC) - R*Math.sin(toeR_L), dZ(WC) - R*Math.cos(toeR_L)];
+    const toeR_R = toe_R * D2R; 
+    const wFront_R = [dX_R(WC_R) - R*Math.sin(toeR_R), dZ_R(WC_R) + R*Math.cos(toeR_R)];
+    const wRear_R  = [dX_R(WC_R) + R*Math.sin(toeR_R), dZ_R(WC_R) - R*Math.cos(toeR_R)];
+
+    const pts=[
+      [dX(HP.UF),dZ(HP.UF)],[dX(HP.UR),dZ(HP.UR)],[dX(U),dZ(U)],[dX(HP.LF),dZ(HP.LF)],[dX(HP.LR),dZ(HP.LR)],[dX(L),dZ(L)],[dX(WC),dZ(WC)],[dX(TR_IN_L),dZ(TR_IN_L)],[dX(TR_OUT),dZ(TR_OUT)], wFront_L, wRear_L,
+      [dX_R(HP.UF),dZ_R(HP.UF)],[dX_R(HP.UR),dZ_R(HP.UR)],[dX_R(U_R),dZ_R(U_R)],[dX_R(HP.LF),dZ_R(HP.LF)],[dX_R(HP.LR),dZ_R(HP.LR)],[dX_R(L_R),dZ_R(L_R)],[dX_R(WC_R),dZ_R(WC_R)],[dX_R(TR_IN_R),dZ_R(TR_IN_R)],[dX_R(TR_OUT_R),dZ_R(TR_OUT_R)], wFront_R, wRear_R,
+      [0,0]
+    ];
+    const box=fitBox(pts,50);
+    const m=mapper(box,w,h,false);
+    
+    svg.appendChild(line(m,[box.minA,0],[box.maxA,0],'#232A32',1,'3,3'));
+    svg.appendChild(line(m,[0,box.minB],[0,box.maxB],'#232A32',1,'3,3'));
+    
+    svg.appendChild(line(m,[dX(TR_IN_L),dZ(TR_IN_L)],[dX_R(TR_IN_R),dZ_R(TR_IN_R)],'#FF4FD1',3));
+    svg.appendChild(line(m,[dX(TR_IN_L),dZ(TR_IN_L)],[dX(TR_OUT),dZ(TR_OUT)],'#FF4FD1',2.5));
+    svg.appendChild(dotMark(m,[dX(TR_IN_L),dZ(TR_IN_L)],'#FF4FD1',3));
+    svg.appendChild(line(m,[dX(HP.UF),dZ(HP.UF)],[dX(U),dZ(U)],'#FFB020',2));
+    svg.appendChild(line(m,[dX(HP.UR),dZ(HP.UR)],[dX(U),dZ(U)],'#FFB020',2));
+    svg.appendChild(line(m,[dX(HP.LF),dZ(HP.LF)],[dX(L),dZ(L)],'#4FD8E8',2));
+    svg.appendChild(line(m,[dX(HP.LR),dZ(HP.LR)],[dX(L),dZ(L)],'#4FD8E8',2));
+    svg.appendChild(line(m,[dX(U),dZ(U)],[dX(L),dZ(L)],'#C9FF3D',2));
+    svg.appendChild(line(m,[dX(M),dZ(M)],[dX(WC),dZ(WC)],'#C9FF3D',2));
+    svg.appendChild(line(m,[dX(M),dZ(M)],[dX(TR_OUT),dZ(TR_OUT)],'#C9FF3D',2.5));
+    svg.appendChild(dotMark(m,[dX(TR_OUT),dZ(TR_OUT)],'#FF4FD1',3));
+    svg.appendChild(line(m,wRear_L,wFront_L,'#C9FF3D',4));
+    svg.appendChild(dotMark(m,[dX(WC),dZ(WC)],'#C9FF3D',3));
+    svg.appendChild(dotMark(m,[dX(U),dZ(U)],'#FFB020',3));
+    svg.appendChild(dotMark(m,[dX(L),dZ(L)],'#4FD8E8',3));
+
+    svg.appendChild(line(m,[dX_R(TR_IN_R),dZ_R(TR_IN_R)],[dX_R(TR_OUT_R),dZ_R(TR_OUT_R)],'#FF4FD1',2.5));
+    svg.appendChild(dotMark(m,[dX_R(TR_IN_R),dZ_R(TR_IN_R)],'#FF4FD1',3));
+    svg.appendChild(line(m,[dX_R(HP.UF),dZ_R(HP.UF)],[dX_R(U_R),dZ_R(U_R)],'#FFB020',2));
+    svg.appendChild(line(m,[dX_R(HP.UR),dZ_R(HP.UR)],[dX_R(U_R),dZ_R(U_R)],'#FFB020',2));
+    svg.appendChild(line(m,[dX_R(HP.LF),dZ_R(HP.LF)],[dX_R(L_R),dZ_R(L_R)],'#4FD8E8',2));
+    svg.appendChild(line(m,[dX_R(HP.LR),dZ_R(HP.LR)],[dX_R(L_R),dZ_R(L_R)],'#4FD8E8',2));
+    svg.appendChild(line(m,[dX_R(U_R),dZ_R(U_R)],[dX_R(L_R),dZ_R(L_R)],'#C9FF3D',2));
+    svg.appendChild(line(m,[dX_R(M_R),dZ_R(M_R)],[dX_R(WC_R),dZ_R(WC_R)],'#C9FF3D',2));
+    svg.appendChild(line(m,[dX_R(M_R),dZ_R(M_R)],[dX_R(TR_OUT_R),dZ_R(TR_OUT_R)],'#C9FF3D',2.5));
+    svg.appendChild(dotMark(m,[dX_R(TR_OUT_R),dZ_R(TR_OUT_R)],'#FF4FD1',3));
+    svg.appendChild(line(m,wRear_R,wFront_R,'#C9FF3D',4));
+    svg.appendChild(dotMark(m,[dX_R(WC_R),dZ_R(WC_R)],'#C9FF3D',3));
+    svg.appendChild(dotMark(m,[dX_R(U_R),dZ_R(U_R)],'#FFB020',3));
+    svg.appendChild(dotMark(m,[dX_R(L_R),dZ_R(L_R)],'#4FD8E8',3));
+
+    svg.setAttribute('viewBox',`0 0 ${w} ${h}`);
+  }
+  
+  // ACKERMANN PROJECTION
+  {
+    const svg=document.getElementById('svgAck'); svg.innerHTML='';
+    const w=300,h=260;
+    const wb = getMM('in_wheelbaseIn') || (53*MM_PER_IN);
+    const rearZ = dZ(HP.WC) - wb;
+
+    const kL = [dX(M), dZ(M)], tL = [dX(TR_OUT), dZ(TR_OUT)];
+    const kR = [dX_R(M_R), dZ_R(M_R)], tR = [dX_R(TR_OUT_R), dZ_R(TR_OUT_R)];
+    const vL = [tL[0]-kL[0], tL[1]-kL[1]], vR = [tR[0]-kR[0], tR[1]-kR[1]];
+    
+    let pRearL = [kL[0], rearZ];
+    if (Math.abs(vL[1]) > 1e-4) pRearL = [kL[0] + ((rearZ - kL[1]) / vL[1]) * vL[0], rearZ];
+    
+    let pRearR = [kR[0], rearZ];
+    if (Math.abs(vR[1]) > 1e-4) pRearR = [kR[0] + ((rearZ - kR[1]) / vR[1]) * vR[0], rearZ];
+    
+    const pts = [kL, tL, kR, tR, pRearL, pRearR, [0, rearZ], [0, dZ(HP.WC)]];
+    const box = fitBox(pts, 100);
+    const m = mapper(box, w, h, false);
+    
+    const txt=(x,y,t,anchor,color,size)=>{ const el=svgEl('text',{x,y,fill:color||'#8A96A3','font-size':size||9,'font-family':'JetBrains Mono,monospace','text-anchor':anchor||'middle'}); el.textContent=t; svg.appendChild(el); };
+
+    svg.appendChild(line(m, [0, box.minB], [0, box.maxB], '#232A32', 1, '3,3'));
+    svg.appendChild(line(m, [box.minA, rearZ], [box.maxA, rearZ], '#3A4552', 1, '3,3'));
+    svg.appendChild(line(m, [box.minA, dZ(HP.WC)], [box.maxA, dZ(HP.WC)], '#3A4552', 1, '3,3'));
+    svg.appendChild(line(m, kL, pRearL, '#C9FF3D', 1.5, '4,4'));
+    svg.appendChild(line(m, kR, pRearR, '#C9FF3D', 1.5, '4,4'));
+    svg.appendChild(line(m, kL, tL, '#FF4FD1', 2.5));
+    svg.appendChild(line(m, kR, tR, '#FF4FD1', 2.5));
+    svg.appendChild(dotMark(m, kL, '#C9FF3D', 3));
+    svg.appendChild(dotMark(m, tL, '#FF4FD1', 3));
+    svg.appendChild(dotMark(m, kR, '#C9FF3D', 3));
+    svg.appendChild(dotMark(m, tR, '#FF4FD1', 3));
+
+    // Orange dimension lines: distance of EACH projected steering line from the
+    // rear-axle centre point (0, rearZ) — measured along the rear-axle row.
+    const [cxPix, dimY] = m(0, rearZ);
+    const [lxPix]       = m(pRearL[0], rearZ);
+    const [rxPix]       = m(pRearR[0], rearZ);
+    const tick = 6;
+    svg.appendChild(dotMark(m, pRearL, '#FFB020', 2.5));
+    svg.appendChild(dotMark(m, pRearR, '#FFB020', 2.5));
+    svg.appendChild(dotMark(m, [0, rearZ], '#E7EDF2', 3));
+
+    const distL = Math.abs(pRearL[0] - 0); // mm, rear-axle centre -> left projected line
+    const distR = Math.abs(pRearR[0] - 0); // mm, rear-axle centre -> right projected line
+
+    // clamp a label's x position (and pick a safe anchor) so text never
+    // gets clipped by the SVG's viewBox edges
+    const safeLabel = (xPix, yPix, t, color, size) => {
+      const half = t.length * (size||9.5) * 0.32; // rough half-width estimate
+      let anchor = 'middle', xx = xPix;
+      if (xx - half < 2) { anchor = 'start'; xx = 2; }
+      else if (xx + half > w - 2) { anchor = 'end'; xx = w - 2; }
+      txt(xx, yPix, t, anchor, color, size);
+    };
+
+    // centre tick
+    svg.appendChild(svgEl('line',{x1:cxPix,y1:dimY-tick,x2:cxPix,y2:dimY+tick,stroke:'#E7EDF2','stroke-width':1.5}));
+
+    // When the two projected lines are nearly symmetric (small/near-zero Ackermann
+    // offset) lxPix, rxPix and cxPix all collapse to almost the same pixel column —
+    // the two tick marks then overdraw each other and both "X.Xmm" labels render on
+    // top of one another as an illegible blob. Detect that case and (a) nudge the
+    // tick marks apart by a couple of px so both remain visible, and (b) stack the
+    // two labels on separate lines with L/R prefixes instead of overlapping them.
+    const tickCloseTogether = Math.abs(lxPix-rxPix) < 10;
+    const lTickX = tickCloseTogether ? cxPix-3 : lxPix;
+    const rTickX = tickCloseTogether ? cxPix+3 : rxPix;
+
+    // Force a minimum horizontal gap between the two label anchors so the
+    // "L x.xmm" / "R x.xmm" strings never overlap, whatever the geometry.
+    // (Stacking one label above the other was tried first, but with the
+    // dimension row sitting near the top of the viewBox that just pushed
+    // text off the top edge instead — a horizontal minimum keeps both
+    // labels on one row and safely inside the canvas via safeLabel's clamp.)
+    const minHalfGap = 32;
+    let lLabelX = (cxPix+lxPix)/2, rLabelX = (cxPix+rxPix)/2;
+    if(Math.abs(rLabelX-lLabelX) < minHalfGap*2){
+      lLabelX = cxPix - minHalfGap; rLabelX = cxPix + minHalfGap;
+    }
+    // Keep the label row from being clipped when the dimension sits near the top edge.
+    const labelY = Math.max(dimY-10, 9);
+
+    // left dimension: centre -> left projected line
+    svg.appendChild(svgEl('line',{x1:cxPix,y1:dimY,x2:lxPix,y2:dimY,stroke:'#FFB020','stroke-width':1.5,'stroke-dasharray':'6,3'}));
+    svg.appendChild(svgEl('line',{x1:lTickX,y1:dimY-tick,x2:lTickX,y2:dimY+tick,stroke:'#FFB020','stroke-width':1.5}));
+    safeLabel(lLabelX, labelY, 'L '+distL.toFixed(1)+'mm', '#FFB020', 10);
+
+    // right dimension: centre -> right projected line
+    svg.appendChild(svgEl('line',{x1:cxPix,y1:dimY,x2:rxPix,y2:dimY,stroke:'#FFB020','stroke-width':1.5,'stroke-dasharray':'6,3'}));
+    svg.appendChild(svgEl('line',{x1:rTickX,y1:dimY-tick,x2:rTickX,y2:dimY+tick,stroke:'#FFB020','stroke-width':1.5}));
+    safeLabel(rLabelX, labelY, 'R '+distR.toFixed(1)+'mm', '#FFB020', 10);
+
+    safeLabel(cxPix, Math.min(dimY+16, h-4), 'REAR AXLE CENTRE', '#586270', 7.5);
+
+    svg.setAttribute('viewBox',`0 0 ${w} ${h}`);
+  }
+
+  // SIDE VIEW
+  {
+    const svg=document.getElementById('svgSide'); svg.innerHTML='';
+    const w=300,h=260, R=setup.tireR;
+    const wA = [dZ(WC)+R, dY(WC)], wB = [dZ(WC)-R, dY(WC)];
+    // The tire is drawn as a full dashed circle of radius R centred on WC, but only the
+    // left/right extremes (wA, wB) were being fed into fitBox — the top/bottom of the
+    // circle then fell outside the computed box and got clipped by the SVG viewport.
+    // Include the vertical extremes too so the whole circle is always visible.
+    const wTopC = [dZ(WC), dY(WC)+R], wBotC = [dZ(WC), dY(WC)-R];
+    const pts=[[dZ(HP.UF),dY(HP.UF)],[dZ(HP.UR),dY(HP.UR)],[dZ(U),dY(U)],[dZ(HP.LF),dY(HP.LF)],[dZ(HP.LR),dY(HP.LR)],[dZ(L),dY(L)],[dZ(WC),dY(WC)],[dZ(TR_IN_L),dY(TR_IN_L)],[dZ(TR_OUT),dY(TR_OUT)],[0,0], wA, wB, wTopC, wBotC];
+    const box=fitBox(pts,60);
+    const m=mapper(box,w,h,true);
+    
+    svg.appendChild(line(m,[box.minA,0],[box.maxA,0],'#232A32',1));
+    svg.appendChild(line(m,[dZ(TR_IN_L),dY(TR_IN_L)],[dZ(TR_OUT),dY(TR_OUT)],'#FF4FD1',2.5));
+    svg.appendChild(dotMark(m,[dZ(TR_IN_L),dY(TR_IN_L)],'#FF4FD1',3));
+    svg.appendChild(line(m,[dZ(HP.UF),dY(HP.UF)],[dZ(U),dY(U)],'#FFB020',2.5));
+    svg.appendChild(line(m,[dZ(HP.UR),dY(HP.UR)],[dZ(U),dY(U)],'#FFB020',2.5));
+    svg.appendChild(line(m,[dZ(HP.LF),dY(HP.LF)],[dZ(L),dY(L)],'#4FD8E8',2.5));
+    svg.appendChild(line(m,[dZ(HP.LR),dY(HP.LR)],[dZ(L),dY(L)],'#4FD8E8',2.5));
+    svg.appendChild(line(m,[dZ(U),dY(U)],[dZ(L),dY(L)],'#C9FF3D',2.5));
+    svg.appendChild(line(m,[dZ(M),dY(M)],[dZ(WC),dY(WC)],'#C9FF3D',2.5));
+    svg.appendChild(line(m,[dZ(M),dY(M)],[dZ(TR_OUT),dY(TR_OUT)],'#C9FF3D',2.5));
+    svg.appendChild(dotMark(m,[dZ(TR_OUT),dY(TR_OUT)],'#FF4FD1',3));
+
+    const [cx,cy]=m(dZ(WC),dY(WC));
+    const rpx = Math.abs(m(dZ(WC)+R,dY(WC))[0]-cx);
+    svg.appendChild(svgEl('circle',{cx,cy,r:rpx,fill:'none',stroke:'#C9FF3D','stroke-width':1.5,'stroke-dasharray':'3,3'}));
+    svg.appendChild(dotMark(m,[dZ(WC),dY(WC)],'#C9FF3D',3));
+    svg.appendChild(dotMark(m,[dZ(U),dY(U)],'#FFB020',3));
+    svg.appendChild(dotMark(m,[dZ(L),dY(L)],'#4FD8E8',3));
+    svg.setAttribute('viewBox',`0 0 ${w} ${h}`);
+  }
+}
+
+function drawChart(svgId, key, color, droopLim, bumpLim, unit){
+  unit = unit===undefined ? '°' : unit;
+  const svg=document.getElementById(svgId); svg.innerHTML='';
+  const w=480,h=220, padL=40,padR=14,padT=14,padB=26;
+  const rows=TABLE.filter(r=>r.travel>=droopLim-1 && r.travel<=bumpLim+1);
+  if(rows.length<2) return;
+  const vals=rows.map(r=>r[key]);
+  const minV=Math.min(...vals), maxV=Math.max(...vals);
+  const spanV=(maxV-minV)||1;
+  const x=(t)=> padL + (t-droopLim)/(bumpLim-droopLim||1) * (w-padL-padR);
+  const y=(v)=> h-padB - (v-minV)/spanV * (h-padT-padB);
+
+  svg.appendChild(svgEl('line',{x1:padL,y1:h-padB,x2:w-padR,y2:h-padB,stroke:'#232A32'}));
+  svg.appendChild(svgEl('line',{x1:padL,y1:padT,x2:padL,y2:h-padB,stroke:'#232A32'}));
+  if(minV<0 && maxV>0){
+    const yz=y(0);
+    svg.appendChild(svgEl('line',{x1:padL,y1:yz,x2:w-padR,y2:yz,stroke:'#3A4552','stroke-dasharray':'3,3'}));
+  }
+  if(droopLim<0 && bumpLim>0){
+    const xz=x(0);
+    svg.appendChild(svgEl('line',{x1:xz,y1:padT,x2:xz,y2:h-padB,stroke:'#3A4552','stroke-dasharray':'3,3'}));
+  }
+  let d='';
+  rows.forEach((r,i)=>{ const px=x(r.travel), py=y(r[key]); d+= (i===0?'M':'L')+px.toFixed(1)+','+py.toFixed(1)+' '; });
+  svg.appendChild(svgEl('path',{d,fill:'none',stroke:color,'stroke-width':2}));
+
+  const lab=(x,y,t,anchor)=>{ const el=svgEl('text',{x,y,fill:'#586270','font-size':9,'font-family':'JetBrains Mono,monospace','text-anchor':anchor||'middle'}); el.textContent=t; svg.appendChild(el); };
+  lab(padL,h-padB+14,droopLim.toFixed(0),'start');
+  lab(w-padR,h-padB+14,'+'+bumpLim.toFixed(0),'end');
+  lab(padL-4,padT+8,maxV.toFixed(1)+unit,'end');
+  lab(padL-4,h-padB,minV.toFixed(1)+unit,'end');
+
+  svg._chartMeta={x,y,droopLim,bumpLim,key};
+  svg.setAttribute('viewBox',`0 0 ${w} ${h}`);
+}
+const CHART_IDS=['chartCamber','chartToe','chartCaster','chartKPI','chartTrail','chartScrub'];
+function drawCharts(droopLim,bumpLim){
+  drawChart('chartCamber','camber','#C9FF3D',droopLim,bumpLim,'°');
+  drawChart('chartToe','toe','#4FD8E8',droopLim,bumpLim,'°');
+  drawChart('chartCaster','caster','#FFB020',droopLim,bumpLim,'°');
+  drawChart('chartKPI','kpi','#F2545B',droopLim,bumpLim,'°');
+  drawChart('chartTrail','trail','#FF4FD1',droopLim,bumpLim,'mm');
+  drawChart('chartScrub','scrub','#8AB4FF',droopLim,bumpLim,'mm');
+}
+function markChartPoint(){
+  CHART_IDS.forEach(id=>{
+    const svg=document.getElementById(id);
+    const meta=svg._chartMeta; if(!meta || !CUR) return;
+    const old=svg.querySelector('.curpt'); if(old) old.remove();
+    const px=meta.x(CUR.travel), py=meta.y(CUR[meta.key]);
+    const c=svgEl('circle',{cx:px,cy:py,r:4,fill:'#fff',class:'curpt'});
+    svg.appendChild(c);
+  });
+}
+
+document.getElementById('sidebar').addEventListener('input', recomputeAll);
+document.getElementById('travelSlider').addEventListener('input', updateAtSlider);
+document.getElementById('rackSlider').addEventListener('input', recomputeAll);
+
+document.getElementById('in_trackIn').addEventListener('input', (e)=>{
+  e.stopPropagation();
+  const wantMm = getMM('in_trackIn');
+  const wcX = getMM('in_WC_x');
+  const curSign = Math.sign(wcX) || -1;
+  const wantHalf = curSign * Math.abs(wantMm/2);
+  const delta = wantHalf - wcX;
+  ['WC','UBJ','LBJ','TR_OUT'].forEach(key=>{
+    const id = `in_${key}_x`;
+    const f=document.getElementById(id);
+    if (f) writeMM(id, getMM(id) + delta);
+  });
+  recomputeAll();
+});
+
+document.getElementById('resetBtn').addEventListener('click', ()=>{
+  resetAllTabUnits();
+  POINT_DEFS.forEach(p=>{ AXES.forEach((ax,i)=>{ document.getElementById(`in_${p.key}_${ax}`).value=p.d[i]; }); });
+  document.getElementById('in_staticCamber').value=0;
+  document.getElementById('in_staticToe').value=0;
+  document.getElementById('in_tireR').value=292.1;
+  document.getElementById('in_tireW').value=180;
+  document.getElementById('in_bumpLim').value=152.4;
+  document.getElementById('in_droopLim').value=-101.6;
+  document.getElementById('in_wheelbaseIn').value=53.00;
+  document.getElementById('in_lockSteer').checked=false;
+  document.getElementById('in_flipCamber').checked=false;
+  document.getElementById('in_flipToe').checked=false;
+  document.getElementById('rackSlider').value=0;
+  recomputeAll();
+});
+
+// Drag and Drop Logic for Dashboard Modules
+const dash = document.getElementById('mainDash');
+let draggedItem = null;
+
+dash.addEventListener('dragstart', e => {
+  if (e.target.classList.contains('dash-module')) {
+    draggedItem = e.target;
+    setTimeout(() => e.target.classList.add('dragging'), 0);
+  }
+});
+
+dash.addEventListener('dragend', e => {
+  if (draggedItem) {
+    draggedItem.classList.remove('dragging');
+    document.querySelectorAll('.dash-module').forEach(m => m.classList.remove('drag-over'));
+    draggedItem = null;
+  }
+});
+
+dash.addEventListener('dragover', e => {
+  e.preventDefault();
+  const afterElement = getDragAfterElement(dash, e.clientY);
+  document.querySelectorAll('.dash-module').forEach(m => m.classList.remove('drag-over'));
+  
+  if (draggedItem) {
+    if (afterElement == null) {
+      dash.appendChild(draggedItem);
+    } else {
+      dash.insertBefore(draggedItem, afterElement);
+      afterElement.classList.add('drag-over');
+    }
+  }
+});
+
+function getDragAfterElement(container, y) {
+  const draggableElements = [...container.querySelectorAll('.dash-module:not(.dragging)')];
+  return draggableElements.reduce((closest, child) => {
+    const box = child.getBoundingClientRect();
+    const offset = y - box.top - box.height / 2;
+    if (offset < 0 && offset > closest.offset) {
+      return { offset: offset, element: child };
+    } else {
+      return closest;
+    }
+  }, { offset: Number.NEGATIVE_INFINITY }).element;
+}
+
+// Pin Tab Logic
+// Only modules inside the Simulator dashboard (#mainDash) carry a .pin-btn;
+// the AI Tuning tab reuses the .dash-module class without one. Previously this
+// handler queried ALL .dash-module elements on the page (both tabs) when
+// clearing existing pins, so it crashed with "Cannot read properties of null
+// (reading 'classList')" the moment it reached an AI-tab module — which
+// aborted the click handler before the actual pinning code ever ran. That's
+// why pinning silently did nothing. Fix: scope the "unpin everything else"
+// pass to modules that actually have a pin button.
+function updateDockOffset(){
+  const tabbar = document.querySelector('.tabbar');
+  if(!tabbar) return;
+  const offset = Math.ceil(tabbar.getBoundingClientRect().bottom);
+  document.documentElement.style.setProperty('--dock-top', offset+'px');
+}
+window.addEventListener('resize', updateDockOffset);
+window.addEventListener('load', updateDockOffset);
+updateDockOffset();
+
+document.querySelectorAll('#mainDash .pin-btn').forEach(btn => {
+  btn.addEventListener('click', (e) => {
+    e.preventDefault(); // Stop the module from collapsing/expanding
+    e.stopPropagation();
+
+    const mod = btn.closest('.dash-module');
+    const isPinned = mod.classList.contains('pinned');
+
+    // Unpin all other pinnable modules first (only 1 sticky item allowed for clean UX)
+    document.querySelectorAll('#mainDash .dash-module').forEach(m => {
+      m.classList.remove('pinned');
+      const pb = m.querySelector('.pin-btn');
+      if(pb) pb.classList.remove('active');
+      m.setAttribute('draggable', 'true');
+    });
+
+    if (!isPinned) {
+      // Apply Pin
+      updateDockOffset();
+      mod.classList.add('pinned');
+      btn.classList.add('active');
+      mod.open = true; // Ensure it stays open
+      mod.setAttribute('draggable', 'false');
+
+      // Move to the very top of the dashboard
+      dash.insertBefore(mod, dash.firstChild);
+      window.scrollTo({top: 0, behavior: 'smooth'});
+    }
+  });
+});
+
+// =====================================================================
+// AI TUNING TAB
+// Reads the live hardpoints / travel-table computed by the Simulator tab,
+// checks a handful of standard double-wishbone metrics against general
+// off-road target bands, and proposes two correction packages:
+//   Set 1 — uses only the app's own derived-geometry fields (arm span,
+//           recess angle, KPI, caster, spindle length) via the existing
+//           rebuildFromDerived() solver, which by construction holds the
+//           wheel centre (and therefore track) fixed — so wheel track and
+//           wheelbase never move.
+//   Set 2 — same corrections scaled up, plus an optional track-width
+//           lever for extra headroom on scrub / roll-centre.
+// =====================================================================
+function clamp(v,a,b){ return Math.max(a, Math.min(b, v)); }
+
+function lineIntersect2D(p1,p2,p3,p4){
+  const d1x=p2.x-p1.x, d1y=p2.y-p1.y, d2x=p4.x-p3.x, d2y=p4.y-p3.y;
+  const denom = d1x*d2y - d1y*d2x;
+  if(Math.abs(denom)<1e-9) return null;
+  const t = ((p3.x-p1.x)*d2y - (p3.y-p1.y)*d2x)/denom;
+  return {x:p1.x+t*d1x, y:p1.y+t*d1y};
+}
+// Front-view swing-arm method: instant centre = intersection of the (projected)
+// upper wishbone pivot-axis-to-ball-joint line and the equivalent lower line;
+// roll centre = where the line from the tyre contact patch through the instant
+// centre crosses the vehicle centreline.
+function computeRollCenter(RP){
+  const avgU={x:(RP.UF.x+RP.UR.x)/2, y:(RP.UF.y+RP.UR.y)/2};
+  const avgL={x:(RP.LF.x+RP.LR.x)/2, y:(RP.LF.y+RP.LR.y)/2};
+  const ubj={x:RP.UBJ.x,y:RP.UBJ.y}, lbj={x:RP.LBJ.x,y:RP.LBJ.y};
+  const ic=lineIntersect2D(avgU,ubj,avgL,lbj);
+  if(!ic) return {height:null, ic:null};
+  const cp={x:RP.WC.x, y:0};
+  const dx=ic.x-cp.x, dy=ic.y-cp.y;
+  if(Math.abs(dx)<1e-9) return {height:null, ic};
+  const t=(0-cp.x)/dx;
+  return {height: cp.y+t*dy, ic};
+}
+
+const AI_TARGETS = {
+  camberGain:{lo:-0.9, hi:-0.35},  // deg per inch of travel, bump vs droop
+  toeRateAbs:0.08,                  // deg per inch — bump steer
+  rc:{lo:50, hi:130},               // mm, front roll-centre height
+  scrubAbs:28,                      // mm
+  trail:{lo:5, hi:28},              // mm
+};
+
+function analyzeGeometry(){
+  const RP=readRawPoints();
+  const D=computeDerived(RP);
+  const rc=computeRollCenter(RP);
+  let campRate=0, toeRate=0, staticScrub=0, staticTrail=0;
+  if(TABLE && TABLE.length>1){
+    const bumpRow=TABLE[TABLE.length-1], droopRow=TABLE[0];
+    const dTravel=bumpRow.travel-droopRow.travel;
+    if(Math.abs(dTravel)>1){
+      campRate=(bumpRow.camber-droopRow.camber)/dTravel*25.4;
+      toeRate=(bumpRow.toe-droopRow.toe)/dTravel*25.4;
+    }
+    const s=nearestRow(0);
+    staticScrub=s.scrub||0; staticTrail=s.trail||0;
+  }
+  return {RP,D,rc,campRate,toeRate,staticScrub,staticTrail};
+}
+
+function generateSuggestions(m){
+  const {D,rc,campRate,toeRate,staticScrub,staticTrail}=m;
+  const set1=[];
+
+  // NOTE: this used to push a 'spanU' delta (distance between the two upper
+  // inboard pivots UF/UR). Tested directly against the solver: sweeping spanU
+  // ±40mm while holding recessU and the UF-UR midpoint fixed changes campRate
+  // by <0.001°/in — because scaling the pivot span symmetrically about a fixed
+  // midpoint slides UF/UR along the *same* axis line rather than moving the
+  // line itself, so the rotation axis the wishbone actually swings about is
+  // unchanged. The fix did nothing. 'uprightLen' (kingpin/upright axis length,
+  // UBJ-LBJ) was verified to give a strong, correctly-signed response instead
+  // (±20mm swept campRate through roughly +2.0 to -0.15°/in in this geometry).
+  if(campRate > AI_TARGETS.camberGain.hi){
+    const mag=clamp((campRate-AI_TARGETS.camberGain.hi)*17, 6, 40);
+    set1.push({title:'Increase negative camber gain', badge:'warn',
+      metric:`${campRate.toFixed(2)}°/in (target ${AI_TARGETS.camberGain.lo} to ${AI_TARGETS.camberGain.hi}°/in)`,
+      rationale:'Camber gain through bump is weak, so the outside tyre runs flatter under load and loses cornering grip. Lengthening the kingpin/upright axis (UBJ–LBJ) increases the effective wishbone swing-arm length and steepens negative-camber gain through travel.',
+      deltas:[{kind:'derived',key:'uprightLen',delta:mag}]});
+  } else if(campRate < AI_TARGETS.camberGain.lo){
+    const mag=clamp((AI_TARGETS.camberGain.lo-campRate)*17, 6, 40);
+    set1.push({title:'Reduce excessive camber gain', badge:'warn',
+      metric:`${campRate.toFixed(2)}°/in (target ${AI_TARGETS.camberGain.lo} to ${AI_TARGETS.camberGain.hi}°/in)`,
+      rationale:'Camber gain is very aggressive, which can over-camber the tyre mid-travel and shrink the contact patch under hard bump. Shortening the kingpin/upright axis (UBJ–LBJ) relaxes the effective wishbone swing-arm length.',
+      deltas:[{kind:'derived',key:'uprightLen',delta:-mag}]});
+  } else {
+    set1.push({title:'Camber gain in range', badge:'good',
+      metric:`${campRate.toFixed(2)}°/in`,
+      rationale:'Camber gain through the travel band sits inside a typical -0.35 to -0.9°/in target for an off-road double wishbone.', deltas:[]});
+  }
+
+  if(Math.abs(toeRate) > AI_TARGETS.toeRateAbs){
+    const mag = clamp(Math.abs(toeRate)*90, 3, 12) * -Math.sign(toeRate);
+    set1.push({title:'Reduce bump steer', badge:'warn',
+      metric:`${toeRate.toFixed(3)}°/in (target within ±${AI_TARGETS.toeRateAbs}°/in)`,
+      rationale:'Toe changes noticeably through travel, which steers the car every time the suspension moves — unsettling on rough ground. Moving the tie-rod inner (rack) pivot height brings its arc closer to matching the wishbone arcs.',
+      deltas:[{kind:'raw',key:'TR_IN',axis:'y',delta:mag}]});
+  } else {
+    set1.push({title:'Bump steer in range', badge:'good',
+      metric:`${toeRate.toFixed(3)}°/in`,
+      rationale:'Toe stays close to constant through the travel band — minimal bump steer.', deltas:[]});
+  }
+
+  if(rc.height!=null){
+    if(rc.height < AI_TARGETS.rc.lo){
+      const mag=clamp((AI_TARGETS.rc.lo+20-rc.height)*0.18, 4, 16);
+      set1.push({title:'Raise front roll centre', badge:'warn',
+        metric:`~${rc.height.toFixed(0)}mm (target ${AI_TARGETS.rc.lo}–${AI_TARGETS.rc.hi}mm)`,
+        rationale:'Estimated roll centre is low, increasing geometric load transfer through the springs/chassis rather than the links. Shortening the lower wishbone raises the front-view instant centre and the roll centre with it.',
+        deltas:[{kind:'derived',key:'spanL',delta:-mag}]});
+    } else if(rc.height > AI_TARGETS.rc.hi){
+      const mag=clamp((rc.height-(AI_TARGETS.rc.hi-20))*0.18, 4, 16);
+      set1.push({title:'Lower front roll centre', badge:'warn',
+        metric:`~${rc.height.toFixed(0)}mm (target ${AI_TARGETS.rc.lo}–${AI_TARGETS.rc.hi}mm)`,
+        rationale:'Estimated roll centre is high, which can produce jacking effects and unpredictable grip loss in hard cornering. Lengthening the lower wishbone lowers the instant centre and roll centre.',
+        deltas:[{kind:'derived',key:'spanL',delta:mag}]});
+    } else {
+      set1.push({title:'Roll centre height in range', badge:'good',
+        metric:`~${rc.height.toFixed(0)}mm`,
+        rationale:'Estimated static front roll-centre height sits inside a typical 50–130mm band for an off-road double wishbone.', deltas:[]});
+    }
+  }
+
+  if(Math.abs(staticScrub) > AI_TARGETS.scrubAbs){
+    const mag = clamp(Math.abs(staticScrub)*0.06, 0.5, 2.5) * Math.sign(staticScrub);
+    set1.push({title:'Reduce scrub radius', badge:'warn',
+      metric:`${staticScrub.toFixed(0)}mm at static ride height (target within ±${AI_TARGETS.scrubAbs}mm)`,
+      rationale:'Scrub radius is large, which amplifies steering kickback over rough terrain and increases steering effort under braking. Increasing kingpin inclination (KPI) reduces scrub for the same wheel position.',
+      deltas:[{kind:'derived',key:'kpi',delta:mag}]});
+  } else {
+    set1.push({title:'Scrub radius in range', badge:'good',
+      metric:`${staticScrub.toFixed(0)}mm`,
+      rationale:'Scrub radius is within a comfortable range.', deltas:[]});
+  }
+
+  if(staticTrail < AI_TARGETS.trail.lo){
+    const mag=clamp((AI_TARGETS.trail.lo+8-staticTrail)*0.08, 0.4, 2.2);
+    set1.push({title:'Add caster / mechanical trail', badge:'warn',
+      metric:`Trail ${staticTrail.toFixed(0)}mm, caster ${D.caster.toFixed(1)}° (target trail ${AI_TARGETS.trail.lo}–${AI_TARGETS.trail.hi}mm)`,
+      rationale:'Mechanical trail is low, so steering will feel light and may not self-centre well. Increasing caster angle moves the kingpin ground-projection forward of the contact patch, adding trail.',
+      deltas:[{kind:'derived',key:'caster',delta:mag}]});
+  } else if(staticTrail > AI_TARGETS.trail.hi){
+    const mag=clamp((staticTrail-(AI_TARGETS.trail.hi-8))*0.08, 0.4, 2.2);
+    set1.push({title:'Reduce caster / mechanical trail', badge:'warn',
+      metric:`Trail ${staticTrail.toFixed(0)}mm, caster ${D.caster.toFixed(1)}° (target trail ${AI_TARGETS.trail.lo}–${AI_TARGETS.trail.hi}mm)`,
+      rationale:'Mechanical trail is high, which will make steering effort heavy, especially at low speed / high grip. Reducing caster angle brings trail back down.',
+      deltas:[{kind:'derived',key:'caster',delta:-mag}]});
+  } else {
+    set1.push({title:'Caster / trail in range', badge:'good',
+      metric:`Trail ${staticTrail.toFixed(0)}mm, caster ${D.caster.toFixed(1)}°`,
+      rationale:'Mechanical trail sits in a comfortable self-centring range.', deltas:[]});
+  }
+
+  // Set 2: same diagnoses, larger allowed correction, plus a track-width lever.
+  const set2 = set1.map(c=>{
+    if(!c.deltas.length) return c;
+    return {...c, deltas:c.deltas.map(d=>({...d, delta:d.delta*1.6}))};
+  });
+  const scrubFlag = Math.abs(staticScrub) > AI_TARGETS.scrubAbs;
+  const rcFlag = rc.height!=null && (rc.height<AI_TARGETS.rc.lo || rc.height>AI_TARGETS.rc.hi);
+  if(scrubFlag || rcFlag){
+    set2.push({title:'Widen wheel track', badge:'warn',
+      metric:'Track currently fixed by hardpoints on Set 1',
+      rationale:'Widening the track moves the contact patch further from the kingpin axis, giving extra headroom to correct scrub radius / roll-centre height without relying on kingpin tilt or arm-length changes alone. Wheelbase is unaffected.',
+      deltas:[{kind:'track', delta: 12}]});
+  }
+
+  return {set1, set2};
+}
+
+function describeDelta(d){
+  if(d.kind==='derived') return `${d.key}  ${d.delta>=0?'+':''}${d.delta.toFixed(2)}`;
+  if(d.kind==='raw')     return `${d.key}.${d.axis}  ${d.delta>=0?'+':''}${d.delta.toFixed(1)} mm`;
+  if(d.kind==='track')   return `Wheel track  ${d.delta>=0?'+':''}${d.delta.toFixed(1)} mm`;
+  return '';
+}
+
+function renderAiCards(containerId, cards, setNum){
+  const root=document.getElementById(containerId);
+  root.innerHTML='';
+  cards.forEach((c,idx)=>{
+    const div=document.createElement('div');
+    div.className='aicard'+(c.badge==='good'?' ok':'');
+    const deltaBlock = c.deltas.length
+      ? `<div class="aic-deltas"><span class="aic-delta-list">${c.deltas.map(describeDelta).join('<br>')}</span><button type="button" class="ai-apply-btn" data-set="${setNum}" data-idx="${idx}">Apply fix</button></div>`
+      : '';
+    div.innerHTML = `<div class="aic-title"><span>${c.title}</span><span class="aic-badge ${c.badge}">${c.badge==='good'?'OK':'TUNE'}</span></div>
+      <div class="aic-rationale">${c.metric?('<b style="color:var(--text);">'+c.metric+'</b><br>'):''}${c.rationale}</div>
+      ${deltaBlock}`;
+    root.appendChild(div);
+  });
+  const tuneN = cards.filter(c=>c.deltas.length).length;
+  const okN = cards.length - tuneN;
+  const summaryEl = document.getElementById('setSummary'+setNum);
+  if(summaryEl){
+    summaryEl.innerHTML = tuneN
+      ? `<span><span class="n tune-n">${tuneN}</span> flagged for tuning</span><span><span class="n ok-n">${okN}</span> already in range</span>`
+      : `<span><span class="n ok-n">All ${okN}</span> metrics in range — nothing to tune</span>`;
+  }
+}
+
+function applyAiDeltas(cards){
+  cards.forEach(c=>{
+    c.deltas.forEach(d=>{
+      if(d.kind==='derived'){
+        const RP=readRawPoints(), D=computeDerived(RP);
+        const newVal=D[d.key]+d.delta;
+        const newPts=rebuildFromDerived(RP, D, d.key, newVal);
+        writeRawPoints(newPts);
+      } else if(d.kind==='raw'){
+        const id=`in_${d.key}_${d.axis}`;
+        writeMM(id, getMM(id)+d.delta);
+      } else if(d.kind==='track'){
+        const field=document.getElementById('in_trackIn');
+        writeMM('in_trackIn', getMM('in_trackIn')+d.delta);
+        field.dispatchEvent(new Event('input',{bubbles:true}));
+      }
+    });
+  });
+}
+
+let AI_SET1=[], AI_SET2=[];
+
+function updateAiTuning(){
+  if(!TABLE || !TABLE.length) return;
+  document.getElementById('aiPushStatus').classList.remove('flash');
+  document.getElementById('aiPushStatus').textContent='';
+  const m=analyzeGeometry();
+
+  const grid=document.getElementById('aiSyncGrid');
+  grid.innerHTML='';
+  POINT_DEFS.forEach(p=>{
+    const rp=m.RP[p.key];
+    const card=document.createElement('div'); card.className='card';
+    card.innerHTML=`<div class="lab">${p.key} — ${p.group}</div><div class="sync-mini">X <b>${rp.x.toFixed(1)}</b>&nbsp; Y <b>${rp.y.toFixed(1)}</b>&nbsp; Z <b>${rp.z.toFixed(1)}</b>&nbsp;mm</div>`;
+    grid.appendChild(card);
+  });
+
+  const mg=document.getElementById('aiMetricsGrid');
+  const mc=(lab,val)=>`<div class="card"><div class="lab">${lab}</div><div class="val" style="font-size:18px;">${val}</div></div>`;
+  mg.innerHTML =
+    mc('Camber gain', m.campRate.toFixed(2)+'&deg;/in') +
+    mc('Bump steer', m.toeRate.toFixed(3)+'&deg;/in') +
+    mc('Roll centre (F)', m.rc.height!=null ? m.rc.height.toFixed(0)+'mm' : '—') +
+    mc('KPI', m.D.kpi.toFixed(1)+'&deg;') +
+    mc('Caster', m.D.caster.toFixed(1)+'&deg;') +
+    mc('Scrub (static)', m.staticScrub.toFixed(0)+'mm') +
+    mc('Trail (static)', m.staticTrail.toFixed(0)+'mm') +
+    mc('Track / Wheelbase', (2*Math.abs(m.RP.WC.x)).toFixed(0)+' / '+getMM('in_wheelbaseIn').toFixed(0)+'mm');
+
+  const {set1,set2}=generateSuggestions(m);
+  AI_SET1=set1; AI_SET2=set2;
+  renderAiCards('aiCards1', set1, 1);
+  renderAiCards('aiCards2', set2, 2);
+}
+
+document.querySelectorAll('.tabbtn').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    document.querySelectorAll('.tabbtn').forEach(b=>b.classList.remove('active'));
+    document.querySelectorAll('.tabpanel').forEach(p=>p.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('tabpanel-'+btn.dataset.tab).classList.add('active');
+    if(btn.dataset.tab==='ai') updateAiTuning();
+  });
+});
+
+function pushAiSet(setKey){
+  const cards = setKey==='set1' ? AI_SET1 : AI_SET2;
+  const active = cards.filter(c=>c.deltas.length);
+  if(!active.length){
+    document.getElementById('aiPushStatus').textContent = 'Nothing to push — every metric is already in range.';
+    return;
+  }
+  applyAiDeltas(active);
+  recomputeAll();
+  document.getElementById('tabbtn-sim').click();
+}
+document.getElementById('pushSet1').addEventListener('click', ()=>pushAiSet('set1'));
+document.getElementById('pushSet2').addEventListener('click', ()=>pushAiSet('set2'));
+
+// Apply a single suggestion card's fix in place, without leaving the AI tab —
+// lets the person accept fixes one at a time and see the metrics update live,
+// instead of only being able to push an entire set at once.
+function applySingleCard(setNum, idx){
+  const cards = setNum===1 ? AI_SET1 : AI_SET2;
+  const card = cards[idx];
+  if(!card || !card.deltas.length) return;
+  const title = card.title;
+  applyAiDeltas([card]);
+  recomputeAll();
+  updateAiTuning();
+  const status = document.getElementById('aiPushStatus');
+  status.textContent = `Applied: ${title}`;
+  status.classList.remove('flash'); void status.offsetWidth; status.classList.add('flash');
+}
+document.getElementById('aiCards1').addEventListener('click', e=>{
+  const btn = e.target.closest('.ai-apply-btn');
+  if(btn) applySingleCard(1, parseInt(btn.dataset.idx,10));
+});
+document.getElementById('aiCards2').addEventListener('click', e=>{
+  const btn = e.target.closest('.ai-apply-btn');
+  if(btn) applySingleCard(2, parseInt(btn.dataset.idx,10));
+});
+
+// Initial compute
+recomputeAll();
+</script>
+</body>
+</html>
