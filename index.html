@@ -7,6 +7,7 @@
 <meta name="description" content="CAD / CAE / MBD portfolio — mechanism kinematics, structural analysis, and interactive engineering tools.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Sans:ital@1&display=swap" rel="stylesheet">
+<script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.5.0/model-viewer.min.js"></script>
 <style>
   :root{
     --graphite-950:#14171b;
@@ -215,6 +216,41 @@
   .plink.primary{border-color:var(--orange-dim);color:var(--orange);}
   .plink.primary:hover{background:var(--orange);color:var(--graphite-950);border-color:var(--orange);}
 
+  /* ---------- 3D CAD viewer ---------- */
+  .cad-grid{
+    display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:24px;
+  }
+  .cad-card{border:1px solid var(--line);background:var(--graphite-900);}
+  .cad-card model-viewer{
+    width:100%;height:320px;display:block;
+    background:radial-gradient(circle at 50% 40%, #262c33 0%, #191d22 75%);
+    --poster-color:transparent;
+  }
+  .cad-card-body{padding:16px 20px 20px;}
+  .cad-card-title{font-family:var(--mono);font-weight:600;font-size:15px;color:var(--text-hi);margin-bottom:4px;}
+  .cad-card-dwg{font-family:var(--mono);font-size:10.5px;color:var(--text-low);margin-bottom:10px;}
+  .cad-card-desc{font-size:13px;color:var(--text-mid);margin-bottom:12px;}
+  .cad-hint{
+    font-family:var(--mono);font-size:10px;color:var(--text-low);letter-spacing:0.03em;
+    display:flex;align-items:center;gap:8px;padding-top:10px;border-top:1px dashed var(--line);
+  }
+  .cad-hint .demo-flag{color:var(--orange);border:1px solid var(--orange-dim);padding:2px 6px;}
+  .cad-pending{
+    width:100%;height:320px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;
+    background:repeating-linear-gradient(135deg, var(--graphite-800) 0px, var(--graphite-800) 10px, var(--graphite-900) 10px, var(--graphite-900) 20px);
+  }
+  .cad-pending svg{opacity:0.35;}
+  .cad-pending span{font-family:var(--mono);font-size:11px;color:var(--text-low);letter-spacing:0.05em;}
+
+  /* ---------- simulation videos ---------- */
+  .sim-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:24px;}
+  .sim-card{border:1px solid var(--line);background:var(--graphite-900);}
+  .sim-card video{width:100%;height:280px;object-fit:cover;display:block;background:#000;}
+  .sim-card-body{padding:16px 20px 20px;}
+  .sim-card-title{font-family:var(--mono);font-weight:600;font-size:15px;color:var(--text-hi);margin-bottom:4px;}
+  .sim-card-dwg{font-family:var(--mono);font-size:10.5px;color:var(--text-low);margin-bottom:10px;}
+  .sim-card-desc{font-size:13px;color:var(--text-mid);margin-bottom:10px;}
+
   /* ---------- process strip ---------- */
   .process{padding:80px 0;border-bottom:1px solid var(--line);}
   .process-row{
@@ -257,8 +293,10 @@
     <nav class="nav-links">
       <a href="#about">01 · ABOUT</a>
       <a href="#projects">02 · PROJECTS</a>
-      <a href="#process">03 · METHOD</a>
-      <a href="#contact">04 · CONTACT</a>
+      <a href="#cad">03 · 3D CAD</a>
+      <a href="#sims">04 · SIMULATIONS</a>
+      <a href="#process">05 · METHOD</a>
+      <a href="#contact">06 · CONTACT</a>
     </nav>
   </div>
 </header>
@@ -658,10 +696,186 @@
 
   </div>
 </section>
-<section id="process">
+
+<!-- ============ 3D CAD ============ -->
+<section id="cad" style="border-bottom:1px solid var(--line);">
   <div class="wrap">
     <div class="titleblock reveal">
       <div class="tb-num">03</div>
+      <h2>3D CAD Work</h2>
+      <div class="tb-meta">DWG NO. CAD—003<br>DRAG TO ORBIT · SCROLL TO ZOOM</div>
+    </div>
+
+    <div class="cad-grid">
+
+      <!-- Live demo model — swap src for your own exported .glb once ready -->
+      <div class="cad-card reveal">
+        <model-viewer
+          src="https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/main/2.0/GearboxAssy/glTF-Binary/GearboxAssy.glb"
+          alt="Gearbox assembly 3D model"
+          auto-rotate
+          camera-controls
+          shadow-intensity="1"
+          exposure="0.9"
+          camera-orbit="35deg 70deg auto">
+        </model-viewer>
+        <div class="cad-card-body">
+          <div class="cad-card-title">Gearbox Assembly</div>
+          <div class="cad-card-dwg">DWG-2026-CAD01 · Interactive glTF Viewer</div>
+          <p class="cad-card-desc">
+            Fully interactive — drag to orbit, scroll to zoom, works on mobile.
+            Placeholder model showing the viewer working end-to-end.
+          </p>
+          <div class="cad-hint"><span class="demo-flag">DEMO</span> Replace with your own .glb export</div>
+        </div>
+      </div>
+
+      <!-- Placeholder card 2 — once you upload models/baja-upright.glb, replace the
+           .cad-pending div below with:
+           <model-viewer src="models/baja-upright.glb" alt="Baja suspension upright 3D model"
+             auto-rotate camera-controls shadow-intensity="1" exposure="0.9"></model-viewer> -->
+      <div class="cad-card reveal">
+        <div class="cad-pending">
+          <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
+          <span>MODEL PENDING</span>
+        </div>
+        <div class="cad-card-body">
+          <div class="cad-card-title">Baja Front Suspension Upright</div>
+          <div class="cad-card-dwg">DWG-2026-CAD02 · Creo Parametric Export</div>
+          <p class="cad-card-desc">
+            Upright/hub assembly from the front double-wishbone suspension —
+            hardpoints matching the live kinematics simulator.
+          </p>
+          <div class="cad-hint"><span class="demo-flag">PENDING</span> Upload models/baja-upright.glb</div>
+        </div>
+      </div>
+
+      <!-- Placeholder card 3 — swap in <model-viewer src="models/reaction-wheel.glb" ...> once uploaded -->
+      <div class="cad-card reveal">
+        <div class="cad-pending">
+          <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
+          <span>MODEL PENDING</span>
+        </div>
+        <div class="cad-card-body">
+          <div class="cad-card-title">Reaction Wheel Assembly</div>
+          <div class="cad-card-dwg">DWG-2026-CAD03 · Nanosatellite Attitude Control</div>
+          <p class="cad-card-desc">
+            3-axis reaction wheel assembly modelled in Creo, validated structurally in
+            ANSYS under simulated rotational loads.
+          </p>
+          <div class="cad-hint"><span class="demo-flag">PENDING</span> Upload models/reaction-wheel.glb</div>
+        </div>
+      </div>
+
+      <!-- Placeholder card 4 — swap in <model-viewer src="models/rocker-bogie.glb" ...> once uploaded -->
+      <div class="cad-card reveal">
+        <div class="cad-pending">
+          <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
+          <span>MODEL PENDING</span>
+        </div>
+        <div class="cad-card-body">
+          <div class="cad-card-title">Rocker-Bogie Rover Chassis</div>
+          <div class="cad-card-dwg">DWG-2026-CAD04 · SolidWorks Export</div>
+          <p class="cad-card-desc">
+            Six-wheel rocker-bogie chassis modelled in SolidWorks for rough-terrain
+            articulation testing in MSC Adams.
+          </p>
+          <div class="cad-hint"><span class="demo-flag">PENDING</span> Upload models/rocker-bogie.glb</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ============ SIMULATION VIDEOS ============ -->
+<section id="sims" style="border-bottom:1px solid var(--line);">
+  <div class="wrap">
+    <div class="titleblock reveal">
+      <div class="tb-num">04</div>
+      <h2>Dynamic Simulation Footage</h2>
+      <div class="tb-meta">DWG NO. SIM—004<br>MSC ADAMS · ANSYS</div>
+    </div>
+
+    <div class="sim-grid">
+
+      <!-- Once uploaded, replace the .cad-pending div with:
+           <video src="videos/atv-four-post-rig.mp4" controls preload="metadata" poster="videos/atv-four-post-rig-poster.jpg"></video> -->
+      <div class="sim-card reveal">
+        <div class="cad-pending">
+          <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg>
+          <span>VIDEO PENDING</span>
+        </div>
+        <div class="sim-card-body">
+          <div class="sim-card-title">Four-Post Rig &amp; Drop-Test Run</div>
+          <div class="sim-card-dwg">DWG-2026-SIM01 · MSC Adams · ATV Suspension</div>
+          <p class="sim-card-desc">
+            Full-vehicle MBD animation from the four-post rig and drop-test analyses used
+            to extract ride frequencies and upright load cases.
+          </p>
+          <div class="cad-hint"><span class="demo-flag">PENDING</span> Upload videos/atv-four-post-rig.mp4</div>
+        </div>
+      </div>
+
+      <!-- <video src="videos/cmp-trajectory.mp4" controls preload="metadata"></video> -->
+      <div class="sim-card reveal">
+        <div class="cad-pending">
+          <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg>
+          <span>VIDEO PENDING</span>
+        </div>
+        <div class="sim-card-body">
+          <div class="sim-card-title">CMP Disc &amp; Tool Trajectory Sweep</div>
+          <div class="sim-card-dwg">DWG-2026-SIM02 · MSC Adams · Kinematics</div>
+          <p class="sim-card-desc">
+            Adams kinematic animation of the CMP machine's four-bar-driven pad motion and
+            disc trajectory, incorporating friction and RPM.
+          </p>
+          <div class="cad-hint"><span class="demo-flag">PENDING</span> Upload videos/cmp-trajectory.mp4</div>
+        </div>
+      </div>
+
+      <!-- <video src="videos/mirror-modal.mp4" controls preload="metadata"></video> -->
+      <div class="sim-card reveal">
+        <div class="cad-pending">
+          <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg>
+          <span>VIDEO PENDING</span>
+        </div>
+        <div class="sim-card-body">
+          <div class="sim-card-title">Mirror Assembly Modal Deformation</div>
+          <div class="sim-card-dwg">DWG-2026-SIM03 · ANSYS · Modal Analysis</div>
+          <p class="sim-card-desc">
+            Mode-shape animation from the optomechanical mirror assembly's modal
+            extraction, feeding into the random-vibration/PSD study.
+          </p>
+          <div class="cad-hint"><span class="demo-flag">PENDING</span> Upload videos/mirror-modal.mp4</div>
+        </div>
+      </div>
+
+      <!-- <video src="videos/reaction-wheel-dynamics.mp4" controls preload="metadata"></video> -->
+      <div class="sim-card reveal">
+        <div class="cad-pending">
+          <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg>
+          <span>VIDEO PENDING</span>
+        </div>
+        <div class="sim-card-body">
+          <div class="sim-card-title">Reaction Wheel Rotational Dynamics</div>
+          <div class="sim-card-dwg">DWG-2026-SIM04 · MSC Adams · Attitude Control</div>
+          <p class="sim-card-desc">
+            Adams animation of the reaction wheel assembly's rotational response under
+            the 3-axis Euler-dynamics control architecture.
+          </p>
+          <div class="cad-hint"><span class="demo-flag">PENDING</span> Upload videos/reaction-wheel-dynamics.mp4</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<section id="process">
+  <div class="wrap">
+    <div class="titleblock reveal">
+      <div class="tb-num">05</div>
       <h2>Method</h2>
       <div class="tb-meta">DWG NO. MTH—002<br>SCALE — NTS</div>
     </div>
