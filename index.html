@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Prakhar Sharma — Mechanical Design & Simulation</title>
+<title>Prakhar Shrivastava — Mechanical Design & Simulation</title>
 <meta name="description" content="CAD / CAE / MBD portfolio — mechanism kinematics, structural analysis, and interactive engineering tools.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Sans:ital@1&display=swap" rel="stylesheet">
@@ -253,7 +253,7 @@
 
 <header class="nav">
   <div class="nav-inner">
-    <div class="brand"><span class="dot"></span>P. SHARMA — DESIGN &amp; SIM</div>
+    <div class="brand"><span class="dot"></span>P. SHRIVASTAVA — DESIGN &amp; SIM</div>
     <nav class="nav-links">
       <a href="#about">01 · ABOUT</a>
       <a href="#projects">02 · PROJECTS</a>
@@ -277,7 +277,7 @@
       </p>
       <div class="hero-cta">
         <a href="#projects" class="btn btn-primary">View Projects ↓</a>
-        <a href="/resume.pdf" class="btn btn-ghost">Download Résumé</a>
+        <a href="resume.pdf" class="btn btn-ghost" target="_blank">Download Résumé</a>
       </div>
     </div>
 
@@ -320,6 +320,18 @@
           Creo Parametric &amp; Solid Edge, GD&amp;T drawing packages, ANSYS structural
           analysis, and MSC Adams multibody simulation.
         </p>
+        <p>
+          Prior internship as <b>NPD Intern at Gabriel India Ltd., Dewas</b> — verified and
+          consolidated Bills of Material across 1000+ damper assemblies, ran DFMEA/PFMEA on
+          suspension components, and applied Lean Six Sigma and MOST Analysis to streamline
+          assembly-line workflows, with hands-on exposure to twin-tube, mono-tube, and
+          strut damper architectures and SAP.
+        </p>
+        <p>
+          <b>Multibody Dynamics Head, Team GS Racers</b> (2025–26) — led the MBD division
+          across suspension, steering, and powertrain analysis. 1st Rank, Validation Event
+          E-BAJA 2026; 7th overall, M-BAJA 2024.
+        </p>
       </div>
 
       <div>
@@ -327,9 +339,10 @@
           <div class="skill-head">CAD / Modelling</div>
           <div class="skill-tags">
             <span class="tag">Creo Parametric</span>
+            <span class="tag">SolidWorks</span>
+            <span class="tag">Siemens NX</span>
             <span class="tag">Solid Edge</span>
             <span class="tag">GD&amp;T</span>
-            <span class="tag">Surfacing</span>
           </div>
         </div>
         <div class="skill-block">
@@ -338,6 +351,7 @@
             <span class="tag">ANSYS</span>
             <span class="tag">Modal Analysis</span>
             <span class="tag">Random Vibration / PSD</span>
+            <span class="tag">Thermal Analysis</span>
             <span class="tag">Contact Mechanics</span>
           </div>
         </div>
@@ -345,6 +359,7 @@
           <div class="skill-head">MBD / Kinematics</div>
           <div class="skill-tags">
             <span class="tag">MSC Adams</span>
+            <span class="tag">IPG CarMaker</span>
             <span class="tag">Four-bar &amp; Double-Wishbone</span>
             <span class="tag">Coordinate-Descent Optimization</span>
           </div>
@@ -354,6 +369,7 @@
           <div class="skill-tags">
             <span class="tag">HTML/JS Simulators</span>
             <span class="tag">Python</span>
+            <span class="tag">C</span>
             <span class="tag">LaTeX / TikZ</span>
             <span class="tag">DOCX XML</span>
           </div>
@@ -507,10 +523,162 @@
       </div>
     </div>
 
+    <!-- Project 5 -->
+    <div class="project reveal">
+      <div class="project-head">
+        <div>
+          <div class="project-title">Suspension &amp; Steering System — Electric ATV (Team GS Racers)</div>
+          <div class="project-dwg">DWG-2026-ATV · Front Double-Wishbone + Rear H-Arm</div>
+        </div>
+        <div class="project-tags">
+          <span class="ptag">MBD</span>
+          <span class="ptag">MSC ADAMS</span>
+          <span class="ptag">TEAM PROJECT</span>
+        </div>
+      </div>
+      <div class="project-body">
+        <p class="project-desc">
+          Designed front double-wishbone and rear H-arm suspension for a competition
+          electric ATV, with full hardpoint definition in MSC Adams. Ran MBD simulations
+          for camber/toe gain, roll centre migration, Ackermann percentage, and steering
+          effort, then validated against four-post rig, sinusoidal ride, and drop-test
+          analyses to extract ride frequencies and upright load cases. Designed jigs and
+          fixtures for arm and steering-link manufacturing. As MBD Head for Team GS Racers,
+          led this division and trained juniors on Creo, SolidWorks, and Adams.
+        </p>
+        <div class="metrics-row">
+          <div class="metric"><div class="v">4-Post</div><div class="l">Rig + Sine + Drop Test</div></div>
+          <div class="metric"><div class="v">Full</div><div class="l">Hardpoint Definition</div></div>
+          <div class="metric"><div class="v">1st</div><div class="l">Rank, E-BAJA 2026 Validation</div></div>
+        </div>
+        <div class="project-links">
+          <a href="#" class="plink">Source on GitHub</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Project 6 -->
+    <div class="project reveal">
+      <div class="project-head">
+        <div>
+          <div class="project-title">Transmission System Analysis — Electric ATV (Team GS Racers)</div>
+          <div class="project-dwg">DWG-2026-TRX · Gearbox &amp; Half-Shaft Dynamics</div>
+        </div>
+        <div class="project-tags">
+          <span class="ptag">MBD</span>
+          <span class="ptag">DRIVELINE</span>
+        </div>
+      </div>
+      <div class="project-body">
+        <p class="project-desc">
+          Dynamic MBD analysis of the ATV gearbox to verify torque transfer, backlash, and
+          shaft alignment, alongside simulation of differential torque split under varying
+          traction conditions. Performed plunge and articulation angle analysis of the
+          half-shafts across full suspension travel to validate CV joint safety margins.
+        </p>
+        <div class="metrics-row">
+          <div class="metric"><div class="v">CV</div><div class="l">Joint Safety Validation</div></div>
+          <div class="metric"><div class="v">Full Travel</div><div class="l">Plunge/Articulation Sweep</div></div>
+        </div>
+        <div class="project-links">
+          <a href="#" class="plink">Source on GitHub</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Project 7 -->
+    <div class="project reveal">
+      <div class="project-head">
+        <div>
+          <div class="project-title">Reaction Wheel Attitude Control System for Nanosatellites</div>
+          <div class="project-dwg">DWG-2026-RWA · 3-Axis Euler Dynamics</div>
+        </div>
+        <div class="project-tags">
+          <span class="ptag">CREO</span>
+          <span class="ptag">MSC ADAMS</span>
+          <span class="ptag">ANSYS</span>
+        </div>
+      </div>
+      <div class="project-body">
+        <p class="project-desc">
+          Modeled a reaction wheel assembly in Creo Parametric and simulated rotational
+          dynamics in MSC Adams. Built a 3-axis Euler-dynamics attitude control
+          architecture and validated the assembly's structural performance under load in
+          ANSYS.
+        </p>
+        <div class="metrics-row">
+          <div class="metric"><div class="v">3-Axis</div><div class="l">Euler Control Architecture</div></div>
+          <div class="metric"><div class="v">Creo → Adams → ANSYS</div><div class="l">Full Toolchain</div></div>
+        </div>
+        <div class="project-links">
+          <a href="#" class="plink">Source on GitHub</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Project 8 -->
+    <div class="project reveal">
+      <div class="project-head">
+        <div>
+          <div class="project-title">Rocker-Bogie Suspension for a Planetary Rover</div>
+          <div class="project-dwg">DWG-2026-RBR · Rough-Terrain Articulation Study</div>
+        </div>
+        <div class="project-tags">
+          <span class="ptag">SOLIDWORKS</span>
+          <span class="ptag">MSC ADAMS</span>
+        </div>
+      </div>
+      <div class="project-body">
+        <p class="project-desc">
+          Modeled a rocker-bogie rover chassis in SolidWorks and implemented it in MSC
+          Adams on a custom rough-terrain test track to evaluate articulation range and
+          stability across obstacle traversal.
+        </p>
+        <div class="metrics-row">
+          <div class="metric"><div class="v">Custom</div><div class="l">Rough-Terrain Test Track</div></div>
+          <div class="metric"><div class="v">SolidWorks → Adams</div><div class="l">Full Toolchain</div></div>
+        </div>
+        <div class="project-links">
+          <a href="#" class="plink">Source on GitHub</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Project 9 -->
+    <div class="project reveal">
+      <div class="project-head">
+        <div>
+          <div class="project-title">Lens Polishing Machine — Quick-Return Motion Elimination</div>
+          <div class="project-dwg">DWG-2026-LPM · 4-Bar Redesign + CMP Kinematics</div>
+        </div>
+        <div class="project-tags">
+          <span class="ptag">MECHANISM DESIGN</span>
+          <span class="ptag">MSC ADAMS</span>
+          <span class="ptag">INTERNSHIP</span>
+        </div>
+      </div>
+      <div class="project-body">
+        <p class="project-desc">
+          At Avinya Miltech, redesigned the 4-bar mechanism of a lens polishing machine to
+          eliminate quick-return motion, and modelled a Chemical-Mechanical-Polishing
+          machine's kinematics in MSC Adams incorporating friction, RPM, and trajectory
+          optimization. Derived concave/convex conic disc profiles from depth-of-cut vs.
+          radial-distance data and calculated Material Removal Rate using Preston's
+          equation for production planning — the analytical foundation behind the CMP
+          Simulator above.
+        </p>
+        <div class="metrics-row">
+          <div class="metric"><div class="v">QRM-Free</div><div class="l">4-Bar Redesign</div></div>
+          <div class="metric"><div class="v">Preston</div><div class="l">Material Removal Model</div></div>
+        </div>
+        <div class="project-links">
+          <a href="cmp-simulator.html" class="plink primary" target="_blank">Related: CMP Simulator ↗</a>
+        </div>
+      </div>
+    </div>
+
   </div>
 </section>
-
-<!-- ============ PROCESS ============ -->
 <section id="process">
   <div class="wrap">
     <div class="titleblock reveal">
@@ -549,10 +717,10 @@
     <div class="contact-grid reveal">
       <h2>Open to Graduate Engineer Trainee &amp; final-year internship roles in automotive / EV / Tier-1 engineering.</h2>
       <div class="contact-links">
-        <a href="mailto:your.email@example.com">your.email@example.com</a>
-        <a href="#">github.com/your-username</a>
-        <a href="#">linkedin.com/in/your-profile</a>
-        <a href="/resume.pdf">Download Résumé (PDF)</a>
+        <a href="mailto:prakhar23j@gmail.com">prakhar23j@gmail.com</a>
+        <a href="https://github.com/prakharshrivastava2307" target="_blank">github.com/prakharshrivastava2307</a>
+        <a href="https://www.linkedin.com/in/prakhar-shrivastava-883152336" target="_blank">linkedin.com/in/prakhar-shrivastava</a>
+        <a href="resume.pdf" target="_blank">Download Résumé (PDF)</a>
       </div>
     </div>
     <div class="foot-bottom">
