@@ -274,6 +274,30 @@
   .sync-mini b{color:var(--text);}
   #aiPushStatus.flash{color:var(--lime);animation:aiflash 1.6s ease;}
   @keyframes aiflash{0%{opacity:0;}12%{opacity:1;}80%{opacity:1;}100%{opacity:0;}}
+/* ===== Embed mode: isolate only the Front View panel (used by the portfolio hero) ===== */
+body.embed-front-mode header.top,
+body.embed-front-mode nav.tabbar,
+body.embed-front-mode aside.sidebar,
+body.embed-front-mode #mod-controls,
+body.embed-front-mode #mod-telemetry,
+body.embed-front-mode #mod-charts,
+body.embed-front-mode .legend,
+body.embed-front-mode .view3d-wrap,
+body.embed-front-mode .views .viewpanel:nth-child(2),
+body.embed-front-mode .views .viewpanel:nth-child(3),
+body.embed-front-mode .views .viewpanel:nth-child(4),
+body.embed-front-mode #mod-visuals > summary {
+  display:none !important;
+}
+body.embed-front-mode{ background:transparent !important; }
+body.embed-front-mode .layout{ display:block !important; }
+body.embed-front-mode main.dash{ padding:0 !important; max-width:none !important; }
+body.embed-front-mode #mod-visuals{ border:none !important; background:transparent !important; margin:0 !important; }
+body.embed-front-mode #mod-visuals .module-content{ padding:0 !important; }
+body.embed-front-mode .views{ display:block !important; }
+body.embed-front-mode .viewpanel{ border:none !important; background:transparent !important; padding:0 !important; height:100% !important; }
+body.embed-front-mode .viewpanel .vt{ display:none !important; }
+body.embed-front-mode #svgFront{ width:100%; height:100%; }
 </style>
 </head>
 <body>
@@ -1828,6 +1852,26 @@ function updateDockOffset(){
 }
 window.addEventListener('resize', updateDockOffset);
 window.addEventListener('load', updateDockOffset);
+
+// ===== Embed mode driver: auto-sweeps the real travel slider for the portfolio hero =====
+if (new URLSearchParams(location.search).get('embed') === 'front') {
+  document.body.classList.add('embed-front-mode');
+  window.addEventListener('load', function(){
+    const slider = document.getElementById('travelSlider');
+    if (!slider) return;
+    const min = parseFloat(slider.min), max = parseFloat(slider.max);
+    const mid = (min+max)/2, amp = (max-min)/2;
+    let t = 0;
+    function step(){
+      t += 0.008;
+      slider.value = (mid + amp * Math.sin(t)).toFixed(1);
+      updateAtSlider();
+      requestAnimationFrame(step);
+    }
+    requestAnimationFrame(step);
+  });
+}
+
 updateDockOffset();
 
 document.querySelectorAll('#mainDash .pin-btn').forEach(btn => {

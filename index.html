@@ -283,8 +283,13 @@
 
     <div class="hero-viz">
       <div class="viz-label tl">FIG. 01 — DOUBLE WISHBONE, FRONT VIEW<br>UNITS: MM · CONVENTION: ADAMS</div>
-      <div class="viz-label br">CAMBER: <span id="camberVal">0.0°</span><br>TRAVEL: <span id="travelVal">0</span> MM</div>
-      <svg id="mechSvg" viewBox="0 0 400 340" preserveAspectRatio="xMidYMid meet"></svg>
+      <div class="viz-label br">LIVE FROM BAJA SUSPENSION SIMULATOR</div>
+      <iframe
+        src="baja-suspension-simulator.html?embed=front"
+        title="Baja front suspension kinematics — front view animation"
+        style="width:100%;height:100%;border:0;pointer-events:none;background:transparent;display:block;"
+        loading="eager">
+      </iframe>
     </div>
   </div>
 </section>
@@ -426,27 +431,33 @@
     <div class="project reveal">
       <div class="project-head">
         <div>
-          <div class="project-title">Analytical CMP Process Simulator</div>
+          <div class="project-title">Analytical CMP Process Simulator &amp; Lens-Polishing QRM Redesign</div>
           <div class="project-dwg">DWG-2026-CMP · Four-Bar Crank-Rocker + Preston Equation</div>
         </div>
         <div class="project-tags">
           <span class="ptag">PROCESS PHYSICS</span>
           <span class="ptag">TRIBOLOGY</span>
+          <span class="ptag">MECHANISM DESIGN</span>
           <span class="ptag">LATEX</span>
         </div>
       </div>
       <div class="project-body">
         <p class="project-desc">
-          Chemical-Mechanical-Polishing simulator modelling a four-bar crank-rocker linkage
-          driving pad motion, Preston-equation material removal, contact mechanics, and
-          surface-topography fitting. Includes an Intelligent Planner tab with synchronized
-          base/top-disc inputs, comparative per-disc graphs on AI suggestion cards, and a
-          toggleable cumulative wear-progression graph. Backed by a 27-page LaTeX/TikZ
+          At Avinya Miltech, redesigned the 4-bar mechanism of a lens polishing machine to
+          eliminate quick-return motion, then modelled the resulting Chemical-Mechanical-
+          Polishing (CMP) machine's kinematics in MSC Adams — incorporating friction, RPM,
+          and trajectory optimization. Derived concave/convex conic disc profiles from
+          depth-of-cut vs. radial-distance data and calculated Material Removal Rate using
+          Preston's equation for production planning. That analytical foundation became
+          this simulator: a four-bar crank-rocker linkage driving pad motion, Preston-
+          equation material removal, contact mechanics, and surface-topography fitting,
+          with an Intelligent Planner tab (synchronized base/top-disc inputs, comparative
+          per-disc graphs, toggleable cumulative wear-progression) and a 27-page LaTeX/TikZ
           technical reference with full first-principles derivations.
         </p>
         <div class="metrics-row">
+          <div class="metric"><div class="v">QRM-Free</div><div class="l">4-Bar Redesign</div></div>
           <div class="metric"><div class="v">27 pg</div><div class="l">Derivation-Backed Reference</div></div>
-          <div class="metric"><div class="v">4-bar</div><div class="l">Crank-Rocker Linkage</div></div>
           <div class="metric"><div class="v">2×</div><div class="l">Disc Wear Comparison</div></div>
         </div>
         <div class="project-links">
@@ -644,39 +655,6 @@
       </div>
     </div>
 
-    <!-- Project 9 -->
-    <div class="project reveal">
-      <div class="project-head">
-        <div>
-          <div class="project-title">Lens Polishing Machine — Quick-Return Motion Elimination</div>
-          <div class="project-dwg">DWG-2026-LPM · 4-Bar Redesign + CMP Kinematics</div>
-        </div>
-        <div class="project-tags">
-          <span class="ptag">MECHANISM DESIGN</span>
-          <span class="ptag">MSC ADAMS</span>
-          <span class="ptag">INTERNSHIP</span>
-        </div>
-      </div>
-      <div class="project-body">
-        <p class="project-desc">
-          At Avinya Miltech, redesigned the 4-bar mechanism of a lens polishing machine to
-          eliminate quick-return motion, and modelled a Chemical-Mechanical-Polishing
-          machine's kinematics in MSC Adams incorporating friction, RPM, and trajectory
-          optimization. Derived concave/convex conic disc profiles from depth-of-cut vs.
-          radial-distance data and calculated Material Removal Rate using Preston's
-          equation for production planning — the analytical foundation behind the CMP
-          Simulator above.
-        </p>
-        <div class="metrics-row">
-          <div class="metric"><div class="v">QRM-Free</div><div class="l">4-Bar Redesign</div></div>
-          <div class="metric"><div class="v">Preston</div><div class="l">Material Removal Model</div></div>
-        </div>
-        <div class="project-links">
-          <a href="cmp-simulator.html" class="plink primary" target="_blank">Related: CMP Simulator ↗</a>
-        </div>
-      </div>
-    </div>
-
   </div>
 </section>
 <section id="process">
@@ -717,7 +695,10 @@
     <div class="contact-grid reveal">
       <h2>Open to Graduate Engineer Trainee &amp; final-year internship roles in automotive / EV / Tier-1 engineering.</h2>
       <div class="contact-links">
-        <a href="mailto:prakhar23j@gmail.com">prakhar23j@gmail.com</a>
+        <div class="email-row" style="display:flex;align-items:center;gap:10px;">
+          <a href="mailto:prakhar23j@gmail.com">prakhar23j@gmail.com</a>
+          <button type="button" id="copyEmailBtn" style="font-family:var(--mono);font-size:10.5px;background:transparent;border:1px solid var(--line);color:var(--text-low);padding:3px 8px;border-radius:2px;cursor:pointer;letter-spacing:0.04em;">COPY</button>
+        </div>
         <a href="https://github.com/prakharshrivastava2307" target="_blank">github.com/prakharshrivastava2307</a>
         <a href="https://www.linkedin.com/in/prakhar-shrivastava-883152336" target="_blank">linkedin.com/in/prakhar-shrivastava</a>
         <a href="resume.pdf" target="_blank">Download Résumé (PDF)</a>
@@ -738,90 +719,18 @@
   }, {threshold:0.12});
   els.forEach(el=>io.observe(el));
 
-  // ---- hero mechanism: animated double-wishbone-style linkage ----
-  const svg = document.getElementById('mechSvg');
-  const NS = 'http://www.w3.org/2000/svg';
-  function el(tag, attrs){
-    const e = document.createElementNS(NS, tag);
-    for(const k in attrs) e.setAttribute(k, attrs[k]);
-    return e;
+  // ---- copy-email fallback (mailto: depends on OS default mail app, which desktops often lack) ----
+  const copyBtn = document.getElementById('copyEmailBtn');
+  if (copyBtn) {
+    copyBtn.addEventListener('click', () => {
+      navigator.clipboard.writeText('prakhar23j@gmail.com').then(() => {
+        const original = copyBtn.textContent;
+        copyBtn.textContent = 'COPIED';
+        setTimeout(() => { copyBtn.textContent = original; }, 1500);
+      });
+    });
   }
 
-  // static frame: ground, grid ticks
-  const gridGroup = el('g', {});
-  for(let x=0; x<=400; x+=40){
-    gridGroup.appendChild(el('line',{x1:x,y1:0,x2:x,y2:340,stroke:'#242a31','stroke-width':1}));
-  }
-  for(let y=0; y<=340; y+=40){
-    gridGroup.appendChild(el('line',{x1:0,y1:y,x2:400,y2:y,stroke:'#242a31','stroke-width':1}));
-  }
-  svg.appendChild(gridGroup);
-
-  // chassis mount reference line
-  svg.appendChild(el('line',{x1:40,y1:60,x2:120,y2:60,stroke:'#3a434f','stroke-width':2,'stroke-dasharray':'4 3'}));
-
-  // pivot points (fixed on chassis side)
-  const upperPivot = {x:70, y:80};
-  const lowerPivot = {x:60, y:230};
-  const armLenU = 130, armLenL = 150;
-
-  // dynamic elements
-  const upperArm = el('line',{stroke:'var(--steel)','stroke-width':4,'stroke-linecap':'round'});
-  const lowerArm = el('line',{stroke:'var(--steel)','stroke-width':5,'stroke-linecap':'round'});
-  const upright  = el('line',{stroke:'#f2f4f6','stroke-width':4,'stroke-linecap':'round'});
-  const wheel    = el('rect',{width:14,height:70,fill:'none',stroke:'var(--orange)','stroke-width':2.5,rx:2});
-  const contactPatch = el('circle',{r:4, fill:'var(--orange)'});
-  const pUpperFixed = el('circle',{r:4, fill:'#f2f4f6'});
-  const pLowerFixed = el('circle',{r:4, fill:'#f2f4f6'});
-  const pUpperOut = el('circle',{r:4, fill:'var(--steel-bright)'});
-  const pLowerOut = el('circle',{r:4, fill:'var(--steel-bright)'});
-
-  [upperArm,lowerArm,upright,wheel,contactPatch,pUpperFixed,pLowerFixed,pUpperOut,pLowerOut].forEach(e=>svg.appendChild(e));
-
-  pUpperFixed.setAttribute('cx', upperPivot.x); pUpperFixed.setAttribute('cy', upperPivot.y);
-  pLowerFixed.setAttribute('cx', lowerPivot.x); pLowerFixed.setAttribute('cy', lowerPivot.y);
-
-  let t = 0;
-  function animate(){
-    t += 0.012;
-    // bump/droop travel oscillation
-    const travel = Math.sin(t) * 34; // vertical wheel travel in px
-    const camberDeg = (travel/34) * -3.2; // simple gain relationship for visual effect
-
-    const uprightBaseY = 240 + travel * -0.9;
-    const uprightTopX = 232 - travel*0.35;
-    const uprightTopY = 100 + travel*0.55;
-    const uprightBotX = 240 + travel*0.15;
-    const uprightBotY = 250 + travel*0.9;
-
-    upperArm.setAttribute('x1', upperPivot.x); upperArm.setAttribute('y1', upperPivot.y);
-    upperArm.setAttribute('x2', uprightTopX); upperArm.setAttribute('y2', uprightTopY);
-
-    lowerArm.setAttribute('x1', lowerPivot.x); lowerArm.setAttribute('y1', lowerPivot.y);
-    lowerArm.setAttribute('x2', uprightBotX); lowerArm.setAttribute('y2', uprightBotY);
-
-    upright.setAttribute('x1', uprightTopX); upright.setAttribute('y1', uprightTopY);
-    upright.setAttribute('x2', uprightBotX); upright.setAttribute('y2', uprightBotY);
-
-    pUpperOut.setAttribute('cx', uprightTopX); pUpperOut.setAttribute('cy', uprightTopY);
-    pLowerOut.setAttribute('cx', uprightBotX); pLowerOut.setAttribute('cy', uprightBotY);
-
-    const midX = (uprightTopX+uprightBotX)/2;
-    const midY = (uprightTopY+uprightBotY)/2;
-    const angle = camberDeg;
-    wheel.setAttribute('x', midX - 7);
-    wheel.setAttribute('y', midY - 35);
-    wheel.setAttribute('transform', `rotate(${angle} ${midX} ${midY})`);
-
-    contactPatch.setAttribute('cx', midX);
-    contactPatch.setAttribute('cy', midY+35);
-
-    document.getElementById('camberVal').textContent = camberDeg.toFixed(1) + '°';
-    document.getElementById('travelVal').textContent = travel.toFixed(0);
-
-    requestAnimationFrame(animate);
-  }
-  animate();
 </script>
 
 </body>
