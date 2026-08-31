@@ -767,12 +767,16 @@
         </div>
       </div>
 
-      <!-- Placeholder card 4 — swap in <model-viewer src="models/rocker-bogie.glb" ...> once uploaded -->
+      <!-- Rover model wired to models/rover_asm_f_asm.glb -->
       <div class="cad-card reveal">
-        <div class="cad-pending">
-          <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
-          <span>MODEL PENDING</span>
-        </div>
+        <model-viewer
+          src="models/rover_asm_f_asm.glb"
+          alt="Rocker-bogie rover chassis 3D model"
+          auto-rotate
+          camera-controls
+          shadow-intensity="1"
+          exposure="0.9">
+        </model-viewer>
         <div class="cad-card-body">
           <div class="cad-card-title">Rocker-Bogie Rover Chassis</div>
           <div class="cad-card-dwg">DWG-2026-CAD04 · SolidWorks Export</div>
@@ -780,7 +784,6 @@
             Six-wheel rocker-bogie chassis modelled in SolidWorks for rough-terrain
             articulation testing in MSC Adams.
           </p>
-          <div class="cad-hint"><span class="demo-flag">PENDING</span> Upload models/rocker-bogie.glb</div>
         </div>
       </div>
 
@@ -865,6 +868,19 @@
             the 3-axis Euler-dynamics control architecture.
           </p>
           <div class="cad-hint"><span class="demo-flag">PENDING</span> Upload videos/reaction-wheel-dynamics.mp4</div>
+        </div>
+      </div>
+
+      <!-- Rover video wired to videos/rover.mp4 -->
+      <div class="sim-card reveal">
+        <video src="videos/rover.mp4" controls preload="metadata"></video>
+        <div class="sim-card-body">
+          <div class="sim-card-title">Rocker-Bogie Rover — Rough-Terrain Traversal</div>
+          <div class="sim-card-dwg">DWG-2026-SIM05 · MSC Adams · Articulation Study</div>
+          <p class="sim-card-desc">
+            Adams animation of the rocker-bogie rover traversing a custom rough-terrain
+            test track, evaluating articulation and stability.
+          </p>
         </div>
       </div>
 
