@@ -6,7 +6,7 @@
 <title>Prakhar Shrivastava — Mechanical Design & Simulation</title>
 <meta name="description" content="CAD / CAE / MBD portfolio — mechanism kinematics, structural analysis, and interactive engineering tools.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Sans:ital@1&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Sans:ital@1&family=Fraunces:ital,opsz,wght@0,9..144,500;1,9..144,500&family=Oswald:wght@500;600;700&display=swap" rel="stylesheet">
 <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.5.0/model-viewer.min.js"></script>
 <style>
   :root{
@@ -27,6 +27,8 @@
     --text-low:#707986;
     --mono: 'IBM Plex Mono', ui-monospace, monospace;
     --sans: 'IBM Plex Sans', system-ui, sans-serif;
+    --serif: 'Fraunces', ui-serif, Georgia, serif;
+    --display: 'Oswald', var(--sans);
   }
   *{box-sizing:border-box;margin:0;padding:0;}
   html{scroll-behavior:smooth;}
@@ -64,14 +66,21 @@
     display:flex;align-items:center;justify-content:space-between;
   }
   .brand{
-    font-family:var(--mono);font-weight:600;font-size:14px;
-    letter-spacing:0.02em;color:var(--text-hi);
+    font-family:var(--display);font-weight:700;font-size:19px;
+    letter-spacing:0.01em;text-transform:uppercase;color:var(--text-hi);
     display:flex;align-items:center;gap:8px;
   }
-  .brand .dot{width:8px;height:8px;background:var(--orange);border-radius:1px;transform:rotate(45deg);}
+  .brand .accent{color:var(--orange);}
   .nav-links{display:flex;gap:28px;font-family:var(--mono);font-size:12.5px;letter-spacing:0.03em;}
   .nav-links a{color:var(--text-mid);text-decoration:none;transition:color .15s;position:relative;}
   .nav-links a:hover{color:var(--steel-bright);}
+  .nav-cta{
+    font-family:var(--mono);font-size:11.5px;letter-spacing:0.04em;text-transform:uppercase;
+    color:var(--orange);border:1px solid var(--orange-dim);padding:9px 16px;
+    text-decoration:none;transition:.15s;white-space:nowrap;
+  }
+  .nav-cta:hover{background:var(--orange);color:var(--graphite-950);border-color:var(--orange);}
+  @media(max-width:700px){ .nav-cta{display:none;} }
   .nav-links a:focus-visible{outline:2px solid var(--orange);outline-offset:4px;}
   @media(max-width:700px){ .nav-links{display:none;} }
 
@@ -95,18 +104,21 @@
   .eyebrow::before{content:'';width:22px;height:1px;background:var(--orange);}
 
   h1{
-    font-family:var(--mono);
+    font-family:var(--display);
     font-weight:700;
-    font-size:clamp(32px,4.6vw,52px);
-    line-height:1.08;
-    letter-spacing:-0.01em;
+    font-size:clamp(42px,7vw,84px);
+    line-height:0.98;
+    letter-spacing:0.005em;
+    text-transform:uppercase;
     color:var(--text-hi);
-    margin-bottom:22px;
+    margin-bottom:24px;
   }
-  h1 span{color:var(--steel-bright);}
+  h1 span{
+    color:var(--orange);
+  }
 
   .hero-sub{
-    font-size:17px;color:var(--text-mid);max-width:520px;margin-bottom:30px;
+    font-size:17.5px;color:var(--text-mid);max-width:520px;margin-bottom:30px;
   }
   .hero-sub b{color:var(--paper-dim);font-weight:500;}
 
@@ -139,23 +151,30 @@
 
   /* ---------- title block (section headers) ---------- */
   .titleblock{
-    display:grid;grid-template-columns:auto 1fr auto;align-items:end;
-    gap:24px;border-bottom:2px solid var(--orange);padding-bottom:14px;margin-bottom:40px;
+    margin-bottom:48px;padding-bottom:20px;border-bottom:2px solid var(--orange);
+  }
+  .tb-eyebrow{
+    display:flex;align-items:center;gap:12px;margin-bottom:14px;
+    font-family:var(--mono);font-size:12px;color:var(--orange);
+    letter-spacing:0.14em;text-transform:uppercase;
+  }
+  .tb-eyebrow::before{content:'';width:26px;height:2px;background:var(--orange);}
+  .titleblock-row{display:flex;justify-content:space-between;align-items:flex-end;gap:24px;flex-wrap:wrap;}
+  .titleblock h2{
+    font-family:var(--display);font-weight:700;font-size:clamp(32px,4.6vw,54px);
+    line-height:1.02;letter-spacing:0.01em;text-transform:uppercase;color:var(--text-hi);
   }
   .titleblock .tb-num{
-    font-family:var(--mono);font-size:12px;color:var(--orange);
-    border:1px solid var(--orange-dim);padding:4px 8px;
-  }
-  .titleblock h2{
-    font-family:var(--mono);font-weight:600;font-size:24px;color:var(--text-hi);
-    letter-spacing:-0.01em;
+    font-family:var(--mono);font-size:11px;color:var(--text-low);
+    border:1px solid var(--line);padding:3px 7px;flex-shrink:0;
+    display:inline-block;margin-bottom:6px;
   }
   .titleblock .tb-meta{
     font-family:var(--mono);font-size:11px;color:var(--text-low);text-align:right;
-    line-height:1.6;
+    line-height:1.6;flex-shrink:0;
   }
   @media(max-width:640px){
-    .titleblock{grid-template-columns:1fr;gap:8px;}
+    .titleblock-row{flex-direction:column;align-items:flex-start;gap:10px;}
     .titleblock .tb-meta{text-align:left;}
   }
 
@@ -216,6 +235,17 @@
   .plink.primary{border-color:var(--orange-dim);color:var(--orange);}
   .plink.primary:hover{background:var(--orange);color:var(--graphite-950);border-color:var(--orange);}
 
+  /* ---------- project filter tabs ---------- */
+  .filter-tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:32px;}
+  .filter-tab{
+    font-family:var(--mono);font-size:12px;letter-spacing:0.03em;
+    padding:8px 16px;border:1px solid var(--line);background:transparent;color:var(--text-mid);
+    cursor:pointer;transition:all .15s;
+  }
+  .filter-tab:hover{border-color:var(--steel);color:var(--steel-bright);}
+  .filter-tab.active{background:var(--orange);border-color:var(--orange);color:var(--graphite-950);font-weight:600;}
+  .project.filtered-out{display:none;}
+
   /* ---------- 3D CAD viewer ---------- */
   .cad-grid{
     display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:24px;
@@ -254,22 +284,50 @@
   /* ---------- process strip ---------- */
   .process{padding:80px 0;border-bottom:1px solid var(--line);}
   .process-row{
-    display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line);border:1px solid var(--line);
+    display:grid;grid-template-columns:1fr 1fr;
+    border-top:1px solid var(--line);border-left:1px solid var(--line);
   }
-  @media(max-width:860px){ .process-row{grid-template-columns:1fr 1fr;} }
-  @media(max-width:520px){ .process-row{grid-template-columns:1fr;} }
-  .process-step{background:var(--graphite-950);padding:24px 22px;}
-  .process-step .pn{font-family:var(--mono);color:var(--orange);font-size:12px;margin-bottom:10px;}
-  .process-step h3{font-family:var(--mono);font-size:15px;color:var(--text-hi);margin-bottom:8px;}
-  .process-step p{font-size:13px;color:var(--text-low);}
+  @media(max-width:700px){ .process-row{grid-template-columns:1fr;} }
+  .process-step{
+    padding:36px 40px 40px;border-right:1px solid var(--line);border-bottom:1px solid var(--line);
+  }
+  .process-step .pn{
+    font-family:var(--display);font-weight:700;font-size:56px;color:var(--orange);
+    opacity:0.35;line-height:1;margin-bottom:2px;
+  }
+  .process-step .pn-rule{width:100%;height:1px;background:var(--line);margin:14px 0 20px;}
+  .process-step h3{
+    font-family:var(--display);font-weight:600;font-size:19px;letter-spacing:0.02em;
+    text-transform:uppercase;color:var(--text-hi);margin-bottom:12px;
+  }
+  .process-step p{font-size:14px;color:var(--text-mid);line-height:1.6;max-width:440px;}
 
   /* ---------- contact / footer ---------- */
   footer{padding:70px 0 40px;}
-  .contact-grid{display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:30px;margin-bottom:50px;}
-  .contact-grid h2{font-family:var(--mono);font-size:28px;color:var(--text-hi);max-width:440px;line-height:1.25;}
-  .contact-links{display:flex;flex-direction:column;gap:10px;font-family:var(--mono);font-size:14px;}
-  .contact-links a{text-decoration:none;color:var(--paper-dim);border-bottom:1px solid transparent;transition:.15s;}
-  .contact-links a:hover{color:var(--steel-bright);border-color:var(--steel-bright);}
+  .contact-grid{display:grid;grid-template-columns:1.2fr 1fr;gap:50px;margin-bottom:50px;}
+  @media(max-width:800px){ .contact-grid{grid-template-columns:1fr;} }
+  .contact-eyebrow{
+    display:flex;align-items:center;gap:12px;margin-bottom:18px;
+    font-family:var(--mono);font-size:12px;color:var(--orange);
+    letter-spacing:0.14em;text-transform:uppercase;
+  }
+  .contact-eyebrow::before{content:'';width:26px;height:2px;background:var(--orange);}
+  .contact-grid h2{
+    font-family:var(--display);font-weight:700;text-transform:uppercase;
+    font-size:clamp(34px,5vw,58px);line-height:1.0;color:var(--text-hi);margin-bottom:20px;
+  }
+  .contact-grid h2 em{font-style:normal;font-family:var(--display);font-weight:700;color:var(--orange);}
+  .contact-grid .contact-sub{font-size:15px;color:var(--text-mid);max-width:420px;line-height:1.6;}
+  .info-blocks{display:flex;flex-direction:column;}
+  .info-block{padding:18px 0;border-bottom:1px solid var(--line);}
+  .info-block:first-child{padding-top:4px;}
+  .info-block-label{
+    font-family:var(--mono);font-size:10.5px;color:var(--text-low);
+    letter-spacing:0.1em;text-transform:uppercase;margin-bottom:6px;
+  }
+  .info-block-value{font-family:var(--sans);font-size:16px;font-weight:600;color:var(--text-hi);}
+  .info-block-value a{color:inherit;text-decoration:none;border-bottom:1px solid transparent;transition:.15s;}
+  .info-block-value a:hover{color:var(--steel-bright);border-color:var(--steel-bright);}
   .foot-bottom{
     border-top:1px solid var(--line);padding-top:20px;
     display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px;
@@ -289,7 +347,7 @@
 
 <header class="nav">
   <div class="nav-inner">
-    <div class="brand"><span class="dot"></span>P. SHRIVASTAVA — DESIGN &amp; SIM</div>
+    <div class="brand">PRAKHAR <span class="accent">SHRIVASTAVA</span></div>
     <nav class="nav-links">
       <a href="#about">01 · ABOUT</a>
       <a href="#projects">02 · PROJECTS</a>
@@ -298,6 +356,7 @@
       <a href="#process">05 · METHOD</a>
       <a href="#contact">06 · CONTACT</a>
     </nav>
+    <a href="#contact" class="nav-cta">Get in Touch</a>
   </div>
 </header>
 
@@ -306,7 +365,7 @@
   <div class="wrap hero-inner">
     <div>
       <div class="eyebrow">GET / R&amp;D CANDIDATE — MECHANICAL DESIGN</div>
-      <h1>Mechanisms, modeled<br>from <span>first principles</span><br>to validated CAD.</h1>
+      <h1>Mechanisms,<br><span>Validated.</span></h1>
       <p class="hero-sub">
         Final-year Mechanical Engineering undergraduate (SGSITS Indore) working across
         <b>CAD, FEA, and multibody dynamics</b> — from closed-form kinematic derivation
@@ -337,9 +396,11 @@
 <section id="about">
   <div class="wrap">
     <div class="titleblock reveal">
-      <div class="tb-num">01</div>
-      <h2>About / Capability Stack</h2>
-      <div class="tb-meta">DWG NO. ABT—001<br>SCALE — NTS</div>
+      <div class="tb-eyebrow">About</div>
+      <div class="titleblock-row">
+        <h2>Capability Stack</h2>
+        <div class="tb-meta"><span class="tb-num">01</span><br>DWG NO. ABT—001</div>
+      </div>
     </div>
 
     <div class="about-grid">
@@ -427,13 +488,21 @@
 <section id="projects">
   <div class="wrap">
     <div class="titleblock reveal">
-      <div class="tb-num">02</div>
-      <h2>Selected Projects</h2>
-      <div class="tb-meta">DWG NO. PRJ—004<br>REV. A</div>
+      <div class="tb-eyebrow">Portfolio</div>
+      <div class="titleblock-row">
+        <h2>The Work</h2>
+        <div class="filter-tabs" role="tablist" aria-label="Filter projects by category">
+          <button type="button" class="filter-tab active" data-filter="all">All</button>
+          <button type="button" class="filter-tab" data-filter="kin">Kinematics / MBD</button>
+          <button type="button" class="filter-tab" data-filter="cae">CAE / Structural</button>
+          <button type="button" class="filter-tab" data-filter="proc">Process Physics</button>
+          <button type="button" class="filter-tab" data-filter="team">Team GS Racers</button>
+        </div>
+      </div>
     </div>
 
     <!-- Project 1 -->
-    <div class="project reveal">
+    <div class="project reveal" data-cat="kin">
       <div class="project-head">
         <div>
           <div class="project-title">Baja SAE Front Suspension Kinematics Simulator</div>
@@ -467,7 +536,7 @@
     </div>
 
     <!-- Project 2 -->
-    <div class="project reveal">
+    <div class="project reveal" data-cat="proc">
       <div class="project-head">
         <div>
           <div class="project-title">Analytical CMP Process Simulator &amp; Lens-Polishing QRM Redesign</div>
@@ -508,7 +577,7 @@
     </div>
 
     <!-- Project 3 -->
-    <div class="project reveal">
+    <div class="project reveal" data-cat="kin">
       <div class="project-head">
         <div>
           <div class="project-title">General Suspension Geometry Visualizer</div>
@@ -540,7 +609,7 @@
     </div>
 
     <!-- Project 4 -->
-    <div class="project reveal">
+    <div class="project reveal" data-cat="cae">
       <div class="project-head">
         <div>
           <div class="project-title">Optomechanical Mirror Assembly — Structural &amp; Random Vibration Analysis</div>
@@ -574,7 +643,7 @@
     </div>
 
     <!-- Project 5 -->
-    <div class="project reveal">
+    <div class="project reveal" data-cat="team">
       <div class="project-head">
         <div>
           <div class="project-title">Suspension &amp; Steering System — Electric ATV (Team GS Racers)</div>
@@ -608,7 +677,7 @@
     </div>
 
     <!-- Project 6 -->
-    <div class="project reveal">
+    <div class="project reveal" data-cat="team">
       <div class="project-head">
         <div>
           <div class="project-title">Transmission System Analysis — Electric ATV (Team GS Racers)</div>
@@ -637,7 +706,7 @@
     </div>
 
     <!-- Project 7 -->
-    <div class="project reveal">
+    <div class="project reveal" data-cat="cae">
       <div class="project-head">
         <div>
           <div class="project-title">Reaction Wheel Attitude Control System for Nanosatellites</div>
@@ -667,7 +736,7 @@
     </div>
 
     <!-- Project 8 -->
-    <div class="project reveal">
+    <div class="project reveal" data-cat="kin">
       <div class="project-head">
         <div>
           <div class="project-title">Rocker-Bogie Suspension for a Planetary Rover</div>
@@ -701,9 +770,11 @@
 <section id="cad" style="border-bottom:1px solid var(--line);">
   <div class="wrap">
     <div class="titleblock reveal">
-      <div class="tb-num">03</div>
-      <h2>3D CAD Work</h2>
-      <div class="tb-meta">DWG NO. CAD—003<br>DRAG TO ORBIT · SCROLL TO ZOOM</div>
+      <div class="tb-eyebrow">Models</div>
+      <div class="titleblock-row">
+        <h2>3D CAD Work</h2>
+        <div class="tb-meta"><span class="tb-num">03</span><br>DRAG TO ORBIT · SCROLL TO ZOOM</div>
+      </div>
     </div>
 
     <div class="cad-grid">
@@ -795,9 +866,11 @@
 <section id="sims" style="border-bottom:1px solid var(--line);">
   <div class="wrap">
     <div class="titleblock reveal">
-      <div class="tb-num">04</div>
-      <h2>Dynamic Simulation Footage</h2>
-      <div class="tb-meta">DWG NO. SIM—004<br>MSC ADAMS · ANSYS</div>
+      <div class="tb-eyebrow">Footage</div>
+      <div class="titleblock-row">
+        <h2>Dynamic Simulations</h2>
+        <div class="tb-meta"><span class="tb-num">04</span><br>MSC ADAMS · ANSYS</div>
+      </div>
     </div>
 
     <div class="sim-grid">
@@ -891,28 +964,34 @@
 <section id="process">
   <div class="wrap">
     <div class="titleblock reveal">
-      <div class="tb-num">05</div>
-      <h2>Method</h2>
-      <div class="tb-meta">DWG NO. MTH—002<br>SCALE — NTS</div>
+      <div class="tb-eyebrow">Approach</div>
+      <div class="titleblock-row">
+        <h2>How I Work</h2>
+        <div class="tb-meta"><span class="tb-num">05</span><br>DWG NO. MTH—002</div>
+      </div>
     </div>
     <div class="process-row reveal">
       <div class="process-step">
-        <div class="pn">A</div>
+        <div class="pn">01</div>
+        <div class="pn-rule"></div>
         <h3>Derive</h3>
         <p>Governing equations and closed-form relationships worked out first — coordinate conventions and assumptions stated explicitly.</p>
       </div>
       <div class="process-step">
-        <div class="pn">B</div>
+        <div class="pn">02</div>
+        <div class="pn-rule"></div>
         <h3>Cross-Validate</h3>
         <p>Analytical results checked against an independent numerical method — brute-force sweeps, circle-intersection solves, or optimizer convergence.</p>
       </div>
       <div class="process-step">
-        <div class="pn">C</div>
+        <div class="pn">03</div>
+        <div class="pn-rule"></div>
         <h3>Build the Tool</h3>
         <p>Interactive simulator or CAE model built so the design space can be explored, not just reported — sliders, live telemetry, tuning modes.</p>
       </div>
       <div class="process-step">
-        <div class="pn">D</div>
+        <div class="pn">04</div>
+        <div class="pn-rule"></div>
         <h3>Document</h3>
         <p>Findings packaged as a proper technical reference — derivations, diagrams, and results a reviewing engineer can audit.</p>
       </div>
@@ -924,15 +1003,38 @@
 <footer id="contact">
   <div class="wrap">
     <div class="contact-grid reveal">
-      <h2>Open to Graduate Engineer Trainee &amp; final-year internship roles in automotive / EV / Tier-1 engineering.</h2>
-      <div class="contact-links">
-        <div class="email-row" style="display:flex;align-items:center;gap:10px;">
-          <a href="mailto:prakhar23j@gmail.com">prakhar23j@gmail.com</a>
-          <button type="button" id="copyEmailBtn" style="font-family:var(--mono);font-size:10.5px;background:transparent;border:1px solid var(--line);color:var(--text-low);padding:3px 8px;border-radius:2px;cursor:pointer;letter-spacing:0.04em;">COPY</button>
+      <div>
+        <div class="contact-eyebrow">Contact</div>
+        <h2>Let's Talk<br><em>Engineering.</em></h2>
+        <p class="contact-sub">
+          Open to Graduate Engineer Trainee &amp; final-year internship roles in
+          automotive / EV / Tier-1 engineering.
+        </p>
+      </div>
+      <div class="info-blocks">
+        <div class="info-block">
+          <div class="info-block-label">Email</div>
+          <div class="info-block-value" style="display:flex;align-items:center;gap:10px;">
+            <a href="mailto:prakhar23j@gmail.com">prakhar23j@gmail.com</a>
+            <button type="button" id="copyEmailBtn" style="font-family:var(--mono);font-size:10.5px;font-weight:400;background:transparent;border:1px solid var(--line);color:var(--text-low);padding:3px 8px;border-radius:2px;cursor:pointer;letter-spacing:0.04em;">COPY</button>
+          </div>
         </div>
-        <a href="https://github.com/prakharshrivastava2307" target="_blank">github.com/prakharshrivastava2307</a>
-        <a href="https://www.linkedin.com/in/prakhar-shrivastava-883152336" target="_blank">linkedin.com/in/prakhar-shrivastava</a>
-        <a href="resume.pdf" target="_blank">Download Résumé (PDF)</a>
+        <div class="info-block">
+          <div class="info-block-label">GitHub</div>
+          <div class="info-block-value"><a href="https://github.com/prakharshrivastava2307" target="_blank">github.com/prakharshrivastava2307</a></div>
+        </div>
+        <div class="info-block">
+          <div class="info-block-label">LinkedIn</div>
+          <div class="info-block-value"><a href="https://www.linkedin.com/in/prakhar-shrivastava-883152336" target="_blank">linkedin.com/in/prakhar-shrivastava</a></div>
+        </div>
+        <div class="info-block">
+          <div class="info-block-label">Location</div>
+          <div class="info-block-value">Indore, Madhya Pradesh, India</div>
+        </div>
+        <div class="info-block" style="border-bottom:none;">
+          <div class="info-block-label">Résumé</div>
+          <div class="info-block-value"><a href="resume.pdf" target="_blank">Download PDF ↓</a></div>
+        </div>
       </div>
     </div>
     <div class="foot-bottom">
@@ -961,6 +1063,21 @@
       });
     });
   }
+
+  // ---- project category filter tabs ----
+  const filterTabs = document.querySelectorAll('.filter-tab');
+  const projectCards = document.querySelectorAll('.project[data-cat]');
+  filterTabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+      filterTabs.forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+      const filter = tab.dataset.filter;
+      projectCards.forEach(card => {
+        const show = filter === 'all' || card.dataset.cat === filter;
+        card.classList.toggle('filtered-out', !show);
+      });
+    });
+  });
 
 </script>
 
