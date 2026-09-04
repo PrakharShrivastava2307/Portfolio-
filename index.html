@@ -82,7 +82,13 @@
   .nav-cta:hover{background:var(--orange);color:var(--graphite-950);border-color:var(--orange);}
   @media(max-width:700px){ .nav-cta{display:none;} }
   .nav-links a:focus-visible{outline:2px solid var(--orange);outline-offset:4px;}
+  .nav-links a.active-link{color:var(--orange);}
   @media(max-width:700px){ .nav-links{display:none;} }
+
+  /* ---------- tabbed content panels ---------- */
+  .tab-panel{display:none;}
+  .tab-panel.active{display:block;animation:panelIn .25s ease;}
+  @keyframes panelIn{ from{opacity:0;transform:translateY(6px);} to{opacity:1;transform:translateY(0);} }
 
   /* ---------- hero ---------- */
   .hero{
@@ -415,7 +421,7 @@
 </section>
 
 <!-- ============ ABOUT ============ -->
-<section id="about">
+<section id="about" class="tab-panel">
   <div class="wrap">
     <div class="titleblock reveal">
       <div class="tb-eyebrow">About</div>
@@ -512,7 +518,7 @@
 </section>
 
 <!-- ============ PROJECTS ============ -->
-<section id="projects">
+<section id="projects" class="tab-panel">
   <div class="wrap">
     <div class="titleblock reveal">
       <div class="tb-eyebrow">Portfolio</div>
@@ -743,7 +749,7 @@
 </section>
 
 <!-- ============ 3D CAD ============ -->
-<section id="cad" style="border-bottom:1px solid var(--line);">
+<section id="cad" class="tab-panel" style="border-bottom:1px solid var(--line);">
   <div class="wrap">
     <div class="titleblock reveal">
       <div class="tb-eyebrow">Models</div>
@@ -830,7 +836,7 @@
 </section>
 
 <!-- ============ DRAFTING & GD&T ============ -->
-<section id="drafting" style="border-bottom:1px solid var(--line);">
+<section id="drafting" class="tab-panel" style="border-bottom:1px solid var(--line);">
   <div class="wrap">
     <div class="titleblock reveal">
       <div class="tb-eyebrow">Drawings</div>
@@ -925,7 +931,7 @@
 </section>
 
 <!-- ============ SIMULATION VIDEOS ============ -->
-<section id="sims" style="border-bottom:1px solid var(--line);">
+<section id="sims" class="tab-panel" style="border-bottom:1px solid var(--line);">
   <div class="wrap">
     <div class="titleblock reveal">
       <div class="tb-eyebrow">Footage</div>
@@ -990,7 +996,7 @@
   </div>
 </section>
 
-<section id="process">
+<section id="process" class="tab-panel">
   <div class="wrap">
     <div class="titleblock reveal">
       <div class="tb-eyebrow">Approach</div>
@@ -1029,7 +1035,7 @@
 </section>
 
 <!-- ============ CONTACT / FOOTER ============ -->
-<footer id="contact">
+<footer id="contact" class="tab-panel">
   <div class="wrap">
     <div class="contact-grid reveal">
       <div>
@@ -1076,6 +1082,39 @@
     entries.forEach(e=>{ if(e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target); } });
   }, {threshold:0.12});
   els.forEach(el=>io.observe(el));
+
+  // ---- tabbed navigation: nav links switch which section is visible ----
+  const tabPanels = document.querySelectorAll('.tab-panel');
+  const navLinks = document.querySelectorAll('.nav-links a, .nav-cta');
+  const panelIds = Array.from(tabPanels).map(p => p.id);
+  const allTabLinks = document.querySelectorAll('a[href^="#"]');
+
+  function activateTab(id, opts = {}) {
+    if (!panelIds.includes(id)) id = 'about';
+    tabPanels.forEach(p => p.classList.toggle('active', p.id === id));
+    navLinks.forEach(a => {
+      const href = a.getAttribute('href') || '';
+      a.classList.toggle('active-link', href === '#' + id);
+    });
+    // reveal-on-scroll elements inside a freshly-shown panel should appear immediately
+    const panel = document.getElementById(id);
+    if (panel) panel.querySelectorAll('.reveal').forEach(el => el.classList.add('in'));
+    if (!opts.skipScroll) window.scrollTo({ top: 0, behavior: 'auto' });
+    if (!opts.skipHistory) history.replaceState(null, '', '#' + id);
+  }
+
+  allTabLinks.forEach(a => {
+    a.addEventListener('click', (e) => {
+      const href = a.getAttribute('href') || '';
+      if (href.startsWith('#') && panelIds.includes(href.slice(1))) {
+        e.preventDefault();
+        activateTab(href.slice(1));
+      }
+    });
+  });
+
+  const startId = (location.hash || '#about').slice(1);
+  activateTab(startId, { skipHistory: true });
 
   // ---- copy-email fallback (mailto: depends on OS default mail app, which desktops often lack) ----
   const copyBtn = document.getElementById('copyEmailBtn');
