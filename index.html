@@ -415,8 +415,8 @@
         </p>
         <p>
           Recent work includes an ADAMS-convention front suspension kinematics simulator
-          for a Baja SAE platform, a Preston-equation CMP process model with a 27-page
-          derivation-backed technical reference, and structural/random-vibration
+          for a Baja SAE platform, a Preston-equation CMP process model with a
+          derivation-backed physics-model reference, and structural/random-vibration
           documentation for an optomechanical mirror assembly (modal → PSD → post-processing
           across 80 modes).
         </p>
@@ -560,17 +560,17 @@
           this simulator: a four-bar crank-rocker linkage driving pad motion, Preston-
           equation material removal, contact mechanics, and surface-topography fitting,
           with an Intelligent Planner tab (synchronized base/top-disc inputs, comparative
-          per-disc graphs, toggleable cumulative wear-progression) and a 27-page LaTeX/TikZ
-          technical reference with full first-principles derivations.
+          per-disc graphs, toggleable cumulative wear-progression) and a LaTeX/TikZ
+          physics-model reference with full first-principles derivations.
         </p>
         <div class="metrics-row">
           <div class="metric"><div class="v">QRM-Free</div><div class="l">4-Bar Redesign</div></div>
-          <div class="metric"><div class="v">27 pg</div><div class="l">Derivation-Backed Reference</div></div>
+          <div class="metric"><div class="v">Preston Eq.</div><div class="l">Derivation-Backed Reference</div></div>
           <div class="metric"><div class="v">2×</div><div class="l">Disc Wear Comparison</div></div>
         </div>
         <div class="project-links">
           <a href="cmp-simulator.html" class="plink primary" target="_blank">Launch Live Simulator ↗</a>
-          <a href="#" class="plink">Technical Reference (PDF)</a>
+          <a href="reports/CMP_Simulator_Physics_Model.pdf" class="plink" target="_blank">Physics Model (PDF)</a>
           <a href="https://github.com/prakharshrivastava2307/Portfolio-/blob/main/cmp-simulator.html" class="plink" target="_blank">Source on GitHub</a>
         </div>
       </div>
@@ -604,7 +604,7 @@
           <div class="metric"><div class="v">Auto</div><div class="l">TOC / LOF / LOT Fields</div></div>
         </div>
         <div class="project-links">
-          <a href="#" class="plink primary">View Report (PDF)</a>
+          <a href="reports/optomechanical_assembly_analysis_report.pdf" class="plink primary" target="_blank">View Report (PDF)</a>
           <a href="#" class="plink">Source on GitHub</a>
         </div>
       </div>
@@ -698,6 +698,7 @@
           <div class="metric"><div class="v">Creo → Adams → ANSYS</div><div class="l">Full Toolchain</div></div>
         </div>
         <div class="project-links">
+          <a href="reports/RWACS_report.pdf" class="plink primary" target="_blank">View Report (PDF)</a>
           <a href="#" class="plink">Source on GitHub</a>
         </div>
       </div>
@@ -873,12 +874,9 @@
         </div>
       </div>
 
-      <!-- <video src="videos/reaction-wheel-dynamics.mp4" controls preload="metadata"></video> -->
+      <!-- Reaction wheel video wired to videos/three_motors.mp4 -->
       <div class="sim-card reveal">
-        <div class="cad-pending">
-          <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg>
-          <span>VIDEO PENDING</span>
-        </div>
+        <video src="videos/three_motors.mp4" controls preload="metadata"></video>
         <div class="sim-card-body">
           <div class="sim-card-title">Reaction Wheel Rotational Dynamics</div>
           <div class="sim-card-dwg">DWG-2026-SIM04 · MSC Adams · Attitude Control</div>
@@ -886,7 +884,6 @@
             Adams animation of the reaction wheel assembly's rotational response under
             the 3-axis Euler-dynamics control architecture.
           </p>
-          <div class="cad-hint"><span class="demo-flag">PENDING</span> Upload videos/reaction-wheel-dynamics.mp4</div>
         </div>
       </div>
 
