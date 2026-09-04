@@ -284,6 +284,24 @@
   .sim-card-dwg{font-family:var(--mono);font-size:10.5px;color:var(--text-low);margin-bottom:10px;}
   .sim-card-desc{font-size:13px;color:var(--text-mid);margin-bottom:10px;}
 
+  /* ---------- drafting / GD&T sheets ---------- */
+  .draft-list{display:flex;flex-direction:column;gap:36px;}
+  .draft-card{border:1px solid var(--line);background:var(--graphite-900);}
+  .draft-card-head{
+    padding:18px 24px;display:flex;justify-content:space-between;align-items:center;
+    flex-wrap:wrap;gap:12px;border-bottom:1px solid var(--line);
+  }
+  .draft-card-title{font-family:var(--display);font-weight:600;font-size:17px;letter-spacing:0.02em;text-transform:uppercase;color:var(--text-hi);}
+  .draft-card-dwg{font-family:var(--mono);font-size:11px;color:var(--text-low);margin-top:3px;}
+  .draft-card-sheet{
+    display:block;background:#fff;line-height:0;
+  }
+  .draft-card-sheet img{width:100%;height:auto;display:block;}
+  .draft-card-foot{
+    padding:14px 24px;display:flex;justify-content:space-between;align-items:center;
+    flex-wrap:wrap;gap:10px;
+  }
+
   /* ---------- process strip ---------- */
   .process{padding:80px 0;border-bottom:1px solid var(--line);}
   .process-row{
@@ -355,6 +373,7 @@
       <a href="#about">ABOUT</a>
       <a href="#projects">PROJECTS</a>
       <a href="#cad">3D CAD</a>
+      <a href="#drafting">DRAFTING</a>
       <a href="#sims">SIMULATIONS</a>
       <a href="#process">METHOD</a>
       <a href="#contact">CONTACT</a>
@@ -810,6 +829,101 @@
   </div>
 </section>
 
+<!-- ============ DRAFTING & GD&T ============ -->
+<section id="drafting" style="border-bottom:1px solid var(--line);">
+  <div class="wrap">
+    <div class="titleblock reveal">
+      <div class="tb-eyebrow">Drawings</div>
+      <div class="titleblock-row">
+        <h2>Drafting &amp; GD&amp;T</h2>
+        <div class="tb-meta"><span class="tb-num">04</span><br>ROTATION STAGE · THIRD-ANGLE PROJECTION</div>
+      </div>
+    </div>
+
+    <div class="draft-list">
+
+      <div class="draft-card reveal">
+        <div class="draft-card-head">
+          <div>
+            <div class="draft-card-title">Rotation Stage — Exploded Assembly &amp; BOM</div>
+            <div class="draft-card-dwg">SHEET 02 OF 02 · 19-ITEM BILL OF MATERIALS</div>
+          </div>
+        </div>
+        <div class="draft-card-sheet">
+          <img src="drafting/rotation-stage-bom.jpg" alt="Rotation Stage exploded assembly drawing with 19-item BOM callouts">
+        </div>
+        <div class="draft-card-foot">
+          <p class="sim-card-desc" style="margin:0;">
+            Full exploded view of the precision rotation stage assembly, with balloon
+            callouts against a 19-item bill of materials — bearing rings, drive motor,
+            fasteners, and locating dowels fully itemized for procurement.
+          </p>
+          <a href="drafting/ROTATION_STAGE_BOM.pdf" class="plink" target="_blank">Open Full PDF ↗</a>
+        </div>
+      </div>
+
+      <div class="draft-card reveal">
+        <div class="draft-card-head">
+          <div>
+            <div class="draft-card-title">MFD — Housing / Mounting Flange</div>
+            <div class="draft-card-dwg">DWG NO. 2311163_01_00_012 · GD&amp;T PER ISO 2768</div>
+          </div>
+        </div>
+        <div class="draft-card-sheet">
+          <img src="drafting/mfd-housing-drawing.jpg" alt="Rotation stage housing and mounting flange manufacturing drawing">
+        </div>
+        <div class="draft-card-foot">
+          <p class="sim-card-desc" style="margin:0;">
+            Machining drawing for the stage's main housing/flange — full section views
+            (A-A, C-C), a 45° chamfer detail callout, and general tolerances per IS 2768.
+          </p>
+          <a href="drafting/rotation_stage_1.pdf" class="plink" target="_blank">Open Full PDF ↗</a>
+        </div>
+      </div>
+
+      <div class="draft-card reveal">
+        <div class="draft-card-head">
+          <div>
+            <div class="draft-card-title">MFD — PCD Mounting Plate</div>
+            <div class="draft-card-dwg">DWG NO. 2311163_01_00_012 · MULTI-PCD HOLE PATTERN</div>
+          </div>
+        </div>
+        <div class="draft-card-sheet">
+          <img src="drafting/mfd-pcd-plate-drawing.jpg" alt="Rotation stage PCD mounting plate manufacturing drawing with multiple bolt circle patterns">
+        </div>
+        <div class="draft-card-foot">
+          <p class="sim-card-desc" style="margin:0;">
+            Rotor/mounting plate with five concentric bolt-circle patterns (PCD 25 to
+            103.08mm) for multi-standard instrument mounting, plus a flatness callout and
+            45° edge-break detail.
+          </p>
+          <a href="drafting/rotation_stage_2.pdf" class="plink" target="_blank">Open Full PDF ↗</a>
+        </div>
+      </div>
+
+      <div class="draft-card reveal">
+        <div class="draft-card-head">
+          <div>
+            <div class="draft-card-title">C Part — Precision Turned Ring</div>
+            <div class="draft-card-dwg">MATERIAL: SS 304 · TURNING OPERATION</div>
+          </div>
+        </div>
+        <div class="draft-card-sheet">
+          <img src="drafting/c-part-drawing.jpg" alt="C Part stainless steel turned ring manufacturing drawing">
+        </div>
+        <div class="draft-card-foot">
+          <p class="sim-card-desc" style="margin:0;">
+            Turned stainless-steel retaining ring — Ø60/Ø57mm with tight +0/-0.02mm
+            tolerance, section view with surface-finish and flatness/parallelism callouts.
+          </p>
+          <a href="drafting/L1_D.pdf" class="plink" target="_blank">Open Full PDF ↗</a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
 <!-- ============ SIMULATION VIDEOS ============ -->
 <section id="sims" style="border-bottom:1px solid var(--line);">
   <div class="wrap">
@@ -817,7 +931,7 @@
       <div class="tb-eyebrow">Footage</div>
       <div class="titleblock-row">
         <h2>Dynamic Simulations</h2>
-        <div class="tb-meta"><span class="tb-num">04</span><br>MSC ADAMS · ANSYS</div>
+        <div class="tb-meta"><span class="tb-num">05</span><br>MSC ADAMS · ANSYS</div>
       </div>
     </div>
 
@@ -882,7 +996,7 @@
       <div class="tb-eyebrow">Approach</div>
       <div class="titleblock-row">
         <h2>How I Work</h2>
-        <div class="tb-meta"><span class="tb-num">05</span><br>DWG NO. MTH—002</div>
+        <div class="tb-meta"><span class="tb-num">06</span><br>DWG NO. MTH—002</div>
       </div>
     </div>
     <div class="process-row reveal">
