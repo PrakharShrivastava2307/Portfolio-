@@ -768,12 +768,16 @@
         </div>
       </div>
 
-      <!-- Placeholder card 2 — swap in <model-viewer src="models/reaction-wheel.glb" ...> once uploaded -->
+      <!-- Reaction wheel model wired to models/reaction-wheel.glb -->
       <div class="cad-card reveal">
-        <div class="cad-pending">
-          <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
-          <span>MODEL PENDING</span>
-        </div>
+        <model-viewer
+          src="models/reaction-wheel.glb"
+          alt="Reaction wheel assembly 3D model"
+          auto-rotate
+          camera-controls
+          shadow-intensity="1"
+          exposure="0.9">
+        </model-viewer>
         <div class="cad-card-body">
           <div class="cad-card-title">Reaction Wheel Assembly</div>
           <div class="cad-card-dwg">DWG-2026-CAD03 · Nanosatellite Attitude Control</div>
@@ -781,7 +785,6 @@
             3-axis reaction wheel assembly modelled in Creo, validated structurally in
             ANSYS under simulated rotational loads.
           </p>
-          <div class="cad-hint"><span class="demo-flag">PENDING</span> Upload models/reaction-wheel.glb</div>
         </div>
       </div>
 
