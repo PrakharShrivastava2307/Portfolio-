@@ -40,7 +40,7 @@
     -webkit-font-smoothing:antialiased;
   }
   ::selection{background:var(--orange);color:var(--graphite-950);}
-
+ 
   /* grid paper texture */
   .grid-bg{
     background-image:
@@ -49,11 +49,11 @@
     background-size: 32px 32px;
     background-position: -1px -1px;
   }
-
+ 
   a{color:inherit;}
   .wrap{max-width:1180px;margin:0 auto;padding:0 32px;}
   @media(max-width:640px){ .wrap{padding:0 20px;} }
-
+ 
   /* ---------- nav ---------- */
   header.nav{
     position:sticky;top:0;z-index:50;
@@ -84,12 +84,10 @@
   .nav-links a:focus-visible{outline:2px solid var(--orange);outline-offset:4px;}
   .nav-links a.active-link{color:var(--orange);}
   @media(max-width:700px){ .nav-links{display:none;} }
-
+ 
   /* ---------- tabbed content panels ---------- */
-  .tab-panel{display:none;}
-  .tab-panel.active{display:block;animation:panelIn .25s ease;}
-  @keyframes panelIn{ from{opacity:0;transform:translateY(6px);} to{opacity:1;transform:translateY(0);} }
-
+  .tab-panel{display:block;}
+ 
   /* ---------- hero ---------- */
   .hero{
     position:relative;
@@ -101,14 +99,14 @@
     display:grid;grid-template-columns:1.1fr 0.9fr;gap:48px;align-items:center;
   }
   @media(max-width:900px){ .hero-inner{grid-template-columns:1fr;} }
-
+ 
   .eyebrow{
     font-family:var(--mono);font-size:12px;color:var(--orange);
     letter-spacing:0.12em;text-transform:uppercase;margin-bottom:18px;
     display:flex;align-items:center;gap:10px;
   }
   .eyebrow::before{content:'';width:22px;height:1px;background:var(--orange);}
-
+ 
   h1{
     font-family:var(--display);
     font-weight:700;
@@ -122,12 +120,12 @@
   h1 span{
     color:var(--orange);
   }
-
+ 
   .hero-sub{
     font-size:17.5px;color:var(--text-mid);max-width:520px;margin-bottom:30px;
   }
   .hero-sub b{color:var(--paper-dim);font-weight:500;}
-
+ 
   .hero-cta{display:flex;gap:14px;flex-wrap:wrap;}
   .btn{
     font-family:var(--mono);font-size:13px;letter-spacing:0.02em;
@@ -139,7 +137,7 @@
   .btn-primary:hover{background:#ff6a37;}
   .btn-ghost{border-color:var(--line);color:var(--text-hi);}
   .btn-ghost:hover{border-color:var(--steel);color:var(--steel-bright);}
-
+ 
   /* coordinate/mechanism signature svg */
   .hero-viz{
     position:relative;
@@ -154,7 +152,7 @@
   }
   .viz-label.tl{top:10px;left:12px;}
   .viz-label.br{bottom:10px;right:12px;text-align:right;}
-
+ 
   /* ---------- title block (section headers) ---------- */
   .titleblock{
     margin-bottom:48px;padding-bottom:20px;border-bottom:2px solid var(--orange);
@@ -183,17 +181,17 @@
     .titleblock-row{flex-direction:column;align-items:flex-start;gap:10px;}
     .titleblock .tb-meta{text-align:left;}
   }
-
+ 
   section{padding:80px 0;}
   section#about{border-bottom:1px solid var(--line);}
   section#projects{border-bottom:1px solid var(--line);}
-
+ 
   /* ---------- about ---------- */
   .about-grid{display:grid;grid-template-columns:1.1fr 1fr;gap:60px;}
   @media(max-width:860px){ .about-grid{grid-template-columns:1fr;gap:36px;} }
   .about-text p{color:var(--text-mid);font-size:15.5px;margin-bottom:16px;max-width:520px;}
   .about-text b{color:var(--text-hi);font-weight:600;}
-
+ 
   .skill-block + .skill-block{margin-top:22px;}
   .skill-head{
     font-family:var(--mono);font-size:11px;color:var(--steel-bright);
@@ -206,7 +204,7 @@
     font-family:var(--mono);font-size:12px;color:var(--paper-dim);
     border:1px solid var(--line);padding:5px 10px;background:var(--graphite-900);
   }
-
+ 
   /* ---------- projects ---------- */
   .project{
     border:1px solid var(--line);background:var(--graphite-900);
@@ -220,10 +218,10 @@
   .project-dwg{font-family:var(--mono);font-size:11px;color:var(--text-low);margin-top:4px;}
   .project-tags{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end;}
   .ptag{font-family:var(--mono);font-size:10.5px;color:var(--orange);border:1px solid var(--orange-dim);padding:3px 7px;}
-
+ 
   .project-body{padding:18px 28px 28px;}
   .project-desc{color:var(--text-mid);font-size:14.5px;margin-bottom:18px;max-width:760px;}
-
+ 
   .metrics-row{
     display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));
     gap:1px;background:var(--line);border:1px solid var(--line);margin-bottom:20px;
@@ -231,7 +229,7 @@
   .metric{background:var(--graphite-950);padding:14px 16px;}
   .metric .v{font-family:var(--mono);font-size:20px;color:var(--steel-bright);font-weight:600;}
   .metric .l{font-family:var(--mono);font-size:10px;color:var(--text-low);text-transform:uppercase;letter-spacing:0.05em;margin-top:3px;}
-
+ 
   .project-links{display:flex;gap:10px;flex-wrap:wrap;}
   .plink{
     font-family:var(--mono);font-size:12px;padding:8px 14px;border:1px solid var(--line);
@@ -240,7 +238,7 @@
   .plink:hover{border-color:var(--steel);color:var(--steel-bright);}
   .plink.primary{border-color:var(--orange-dim);color:var(--orange);}
   .plink.primary:hover{background:var(--orange);color:var(--graphite-950);border-color:var(--orange);}
-
+ 
   /* ---------- project filter tabs ---------- */
   .filter-tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:32px;}
   .filter-tab{
@@ -251,7 +249,7 @@
   .filter-tab:hover{border-color:var(--steel);color:var(--steel-bright);}
   .filter-tab.active{background:var(--orange);border-color:var(--orange);color:var(--graphite-950);font-weight:600;}
   .project.filtered-out{display:none;}
-
+ 
   /* ---------- 3D CAD viewer ---------- */
   .cad-grid{
     display:grid;grid-template-columns:repeat(auto-fit,minmax(480px,1fr));gap:24px;
@@ -280,7 +278,7 @@
   }
   .cad-pending svg{opacity:0.35;}
   .cad-pending span{font-family:var(--mono);font-size:11px;color:var(--text-low);letter-spacing:0.05em;}
-
+ 
   /* ---------- simulation videos ---------- */
   .sim-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(480px,1fr));gap:24px;}
   .sim-card{border:1px solid var(--line);background:var(--graphite-900);}
@@ -289,25 +287,32 @@
   .sim-card-title{font-family:var(--mono);font-weight:600;font-size:15px;color:var(--text-hi);margin-bottom:4px;}
   .sim-card-dwg{font-family:var(--mono);font-size:10.5px;color:var(--text-low);margin-bottom:10px;}
   .sim-card-desc{font-size:13px;color:var(--text-mid);margin-bottom:10px;}
-
+ 
   /* ---------- drafting / GD&T sheets ---------- */
-  .draft-list{display:flex;flex-direction:column;gap:36px;}
-  .draft-card{border:1px solid var(--line);background:var(--graphite-900);}
+  .draft-list{display:grid;grid-template-columns:repeat(auto-fit,minmax(400px,1fr));gap:24px;}
+  .draft-card{border:1px solid var(--line);background:var(--graphite-900);display:flex;flex-direction:column;}
   .draft-card-head{
-    padding:18px 24px;display:flex;justify-content:space-between;align-items:center;
-    flex-wrap:wrap;gap:12px;border-bottom:1px solid var(--line);
+    padding:16px 20px;display:flex;justify-content:space-between;align-items:center;
+    flex-wrap:wrap;gap:10px;border-bottom:1px solid var(--line);
   }
-  .draft-card-title{font-family:var(--display);font-weight:600;font-size:17px;letter-spacing:0.02em;text-transform:uppercase;color:var(--text-hi);}
-  .draft-card-dwg{font-family:var(--mono);font-size:11px;color:var(--text-low);margin-top:3px;}
+  .draft-card-title{font-family:var(--display);font-weight:600;font-size:15px;letter-spacing:0.02em;text-transform:uppercase;color:var(--text-hi);}
+  .draft-card-dwg{font-family:var(--mono);font-size:10.5px;color:var(--text-low);margin-top:3px;}
   .draft-card-sheet{
-    display:block;background:#fff;line-height:0;
+    display:flex;align-items:center;justify-content:center;background:#fff;
+    height:260px;overflow:hidden;cursor:pointer;position:relative;
   }
-  .draft-card-sheet img{width:100%;height:auto;display:block;}
+  .draft-card-sheet img{width:100%;height:100%;object-fit:contain;display:block;}
+  .draft-card-sheet::after{
+    content:'⤢ CLICK TO OPEN FULL PDF';
+    position:absolute;bottom:8px;right:10px;
+    font-family:var(--mono);font-size:9.5px;letter-spacing:0.04em;
+    color:#666;background:rgba(255,255,255,0.85);padding:3px 7px;
+  }
   .draft-card-foot{
-    padding:14px 24px;display:flex;justify-content:space-between;align-items:center;
-    flex-wrap:wrap;gap:10px;
+    padding:14px 20px;display:flex;flex-direction:column;gap:10px;flex:1;
   }
-
+  .draft-card-foot .sim-card-desc{font-size:12.5px;}
+ 
   /* ---------- process strip ---------- */
   .process{padding:80px 0;border-bottom:1px solid var(--line);}
   .process-row{
@@ -328,7 +333,7 @@
     text-transform:uppercase;color:var(--text-hi);margin-bottom:12px;
   }
   .process-step p{font-size:14px;color:var(--text-mid);line-height:1.6;max-width:440px;}
-
+ 
   /* ---------- contact / footer ---------- */
   footer{padding:70px 0 40px;}
   .contact-grid{display:grid;grid-template-columns:1.2fr 1fr;gap:50px;margin-bottom:50px;}
@@ -360,7 +365,7 @@
     display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px;
     font-family:var(--mono);font-size:11px;color:var(--text-low);
   }
-
+ 
   /* fade-up on scroll */
   .reveal{opacity:0;transform:translateY(14px);transition:opacity .6s ease, transform .6s ease;}
   .reveal.in{opacity:1;transform:translateY(0);}
@@ -371,7 +376,7 @@
 </style>
 </head>
 <body class="grid-bg">
-
+ 
 <header class="nav">
   <div class="nav-inner">
     <div class="brand">PRAKHAR <span class="accent">SHRIVASTAVA</span></div>
@@ -387,7 +392,7 @@
     <a href="#contact" class="nav-cta">Get in Touch</a>
   </div>
 </header>
-
+ 
 <!-- ============ HERO ============ -->
 <section class="hero">
   <div class="wrap hero-inner">
@@ -405,7 +410,7 @@
         <a href="resume.pdf" class="btn btn-ghost" target="_blank">Download Resume</a>
       </div>
     </div>
-
+ 
     <div class="hero-viz">
       <div class="viz-label tl">FIG. 01 — DOUBLE WISHBONE, FRONT VIEW<br>UNITS: MM · CONVENTION: ADAMS</div>
       <div class="viz-label br">LIVE FROM BAJA SUSPENSION SIMULATOR</div>
@@ -419,7 +424,7 @@
     </div>
   </div>
 </section>
-
+ 
 <!-- ============ ABOUT ============ -->
 <section id="about" class="tab-panel">
   <div class="wrap">
@@ -430,7 +435,7 @@
         <div class="tb-meta"><span class="tb-num">01</span><br>DWG NO. ABT—001</div>
       </div>
     </div>
-
+ 
     <div class="about-grid">
       <div class="about-text reveal">
         <p>
@@ -466,7 +471,7 @@
           E-BAJA 2026; 7th overall, M-BAJA 2024.
         </p>
       </div>
-
+ 
       <div>
         <div class="skill-block">
           <div class="skill-head">CAD / Modelling / Drafting</div>
@@ -516,7 +521,7 @@
     </div>
   </div>
 </section>
-
+ 
 <!-- ============ PROJECTS ============ -->
 <section id="projects" class="tab-panel">
   <div class="wrap">
@@ -533,7 +538,7 @@
         </div>
       </div>
     </div>
-
+ 
     <!-- Project 1 -->
     <div class="project reveal" data-cat="kin">
       <div class="project-head">
@@ -559,7 +564,7 @@
         </div>
       </div>
     </div>
-
+ 
     <!-- Project 2 -->
     <div class="project reveal" data-cat="proc">
       <div class="project-head">
@@ -599,7 +604,7 @@
         </div>
       </div>
     </div>
-
+ 
     <!-- Project 3 -->
     <div class="project reveal" data-cat="cae">
       <div class="project-head">
@@ -631,7 +636,7 @@
         </div>
       </div>
     </div>
-
+ 
     <!-- Project 4 -->
     <div class="project reveal" data-cat="team">
       <div class="project-head">
@@ -663,7 +668,7 @@
         </div>
       </div>
     </div>
-
+ 
     <!-- Project 5 -->
     <div class="project reveal" data-cat="team">
       <div class="project-head">
@@ -689,7 +694,7 @@
         </div>
       </div>
     </div>
-
+ 
     <!-- Project 6 -->
     <div class="project reveal" data-cat="cae">
       <div class="project-head">
@@ -719,7 +724,7 @@
         </div>
       </div>
     </div>
-
+ 
     <!-- Project 7 -->
     <div class="project reveal" data-cat="kin">
       <div class="project-head">
@@ -744,10 +749,10 @@
         </div>
       </div>
     </div>
-
+ 
   </div>
 </section>
-
+ 
 <!-- ============ 3D CAD ============ -->
 <section id="cad" class="tab-panel" style="border-bottom:1px solid var(--line);">
   <div class="wrap">
@@ -758,9 +763,9 @@
         <div class="tb-meta"><span class="tb-num">03</span><br>DRAG TO ORBIT · SCROLL TO ZOOM</div>
       </div>
     </div>
-
+ 
     <div class="cad-grid">
-
+ 
       <!-- Full Vehicle Baja Assembly -->
       <div class="cad-card reveal">
         <video src="videos/full_vehicle_baja.mp4" controls controlsList="nodownload" oncontextmenu="return false;" preload="metadata"></video>
@@ -772,7 +777,7 @@
           </p>
         </div>
       </div>
-
+ 
       <!-- Rover model -->
       <div class="cad-card reveal">
         <model-viewer
@@ -830,11 +835,11 @@
           </p>
         </div>
       </div>
-
+ 
     </div>
   </div>
 </section>
-
+ 
 <!-- ============ DRAFTING & GD&T ============ -->
 <section id="drafting" class="tab-panel" style="border-bottom:1px solid var(--line);">
   <div class="wrap">
@@ -845,9 +850,9 @@
         <div class="tb-meta"><span class="tb-num">04</span><br>ROTATION STAGE · THIRD-ANGLE PROJECTION</div>
       </div>
     </div>
-
+ 
     <div class="draft-list">
-
+ 
       <div class="draft-card reveal">
         <div class="draft-card-head">
           <div>
@@ -855,9 +860,9 @@
             <div class="draft-card-dwg">SHEET 02 OF 02 · 19-ITEM BILL OF MATERIALS</div>
           </div>
         </div>
-        <div class="draft-card-sheet">
+        <a class="draft-card-sheet" href="drafting/ROTATION_STAGE_BOM.pdf" target="_blank" title="Open full PDF">
           <img src="drafting/rotation-stage-bom.jpg" alt="Rotation Stage exploded assembly drawing with 19-item BOM callouts">
-        </div>
+        </a>
         <div class="draft-card-foot">
           <p class="sim-card-desc" style="margin:0;">
             Full exploded view of the precision rotation stage assembly, with balloon
@@ -867,7 +872,7 @@
           <a href="drafting/ROTATION_STAGE_BOM.pdf" class="plink" target="_blank">Open Full PDF ↗</a>
         </div>
       </div>
-
+ 
       <div class="draft-card reveal">
         <div class="draft-card-head">
           <div>
@@ -875,9 +880,9 @@
             <div class="draft-card-dwg">DWG NO. 2311163_01_00_012 · GD&amp;T PER ISO 2768</div>
           </div>
         </div>
-        <div class="draft-card-sheet">
+        <a class="draft-card-sheet" href="drafting/rotation_stage_1.pdf" target="_blank" title="Open full PDF">
           <img src="drafting/mfd-housing-drawing.jpg" alt="Rotation stage housing and mounting flange manufacturing drawing">
-        </div>
+        </a>
         <div class="draft-card-foot">
           <p class="sim-card-desc" style="margin:0;">
             Machining drawing for the stage's main housing/flange — full section views
@@ -886,7 +891,7 @@
           <a href="drafting/rotation_stage_1.pdf" class="plink" target="_blank">Open Full PDF ↗</a>
         </div>
       </div>
-
+ 
       <div class="draft-card reveal">
         <div class="draft-card-head">
           <div>
@@ -894,9 +899,9 @@
             <div class="draft-card-dwg">DWG NO. 2311163_01_00_012 · MULTI-PCD HOLE PATTERN</div>
           </div>
         </div>
-        <div class="draft-card-sheet">
+        <a class="draft-card-sheet" href="drafting/rotation_stage_2.pdf" target="_blank" title="Open full PDF">
           <img src="drafting/mfd-pcd-plate-drawing.jpg" alt="Rotation stage PCD mounting plate manufacturing drawing with multiple bolt circle patterns">
-        </div>
+        </a>
         <div class="draft-card-foot">
           <p class="sim-card-desc" style="margin:0;">
             Rotor/mounting plate with five concentric bolt-circle patterns (PCD 25 to
@@ -906,7 +911,7 @@
           <a href="drafting/rotation_stage_2.pdf" class="plink" target="_blank">Open Full PDF ↗</a>
         </div>
       </div>
-
+ 
       <div class="draft-card reveal">
         <div class="draft-card-head">
           <div>
@@ -914,9 +919,9 @@
             <div class="draft-card-dwg">MATERIAL: SS 304 · TURNING OPERATION</div>
           </div>
         </div>
-        <div class="draft-card-sheet">
+        <a class="draft-card-sheet" href="drafting/L1_D.pdf" target="_blank" title="Open full PDF">
           <img src="drafting/c-part-drawing.jpg" alt="C Part stainless steel turned ring manufacturing drawing">
-        </div>
+        </a>
         <div class="draft-card-foot">
           <p class="sim-card-desc" style="margin:0;">
             Turned stainless-steel retaining ring — Ø60/Ø57mm with tight +0/-0.02mm
@@ -925,11 +930,11 @@
           <a href="drafting/L1_D.pdf" class="plink" target="_blank">Open Full PDF ↗</a>
         </div>
       </div>
-
+ 
     </div>
   </div>
 </section>
-
+ 
 <!-- ============ SIMULATION VIDEOS ============ -->
 <section id="sims" class="tab-panel" style="border-bottom:1px solid var(--line);">
   <div class="wrap">
@@ -940,9 +945,9 @@
         <div class="tb-meta"><span class="tb-num">05</span><br>MSC ADAMS · ANSYS</div>
       </div>
     </div>
-
+ 
     <div class="sim-grid">
-
+ 
       <div class="sim-card reveal">
         <video src="videos/fourpost_rig.mp4" controls controlsList="nodownload" oncontextmenu="return false;" preload="metadata"></video>
         <div class="sim-card-body">
@@ -954,7 +959,7 @@
           </p>
         </div>
       </div>
-
+ 
       <div class="sim-card reveal">
         <video src="videos/sinusoidal_ride.mp4" controls controlsList="nodownload" oncontextmenu="return false;" preload="metadata"></video>
         <div class="sim-card-body">
@@ -965,7 +970,7 @@
           </p>
         </div>
       </div>
-
+ 
       <!-- Reaction wheel video  -->
       <div class="sim-card reveal">
         <video src="videos/three_motors.mp4" controls controlsList="nodownload" oncontextmenu="return false;" preload="metadata"></video>
@@ -978,7 +983,7 @@
           </p>
         </div>
       </div>
-
+ 
       <!-- Rover video -->
       <div class="sim-card reveal">
         <video src="videos/rover.mp4" controls controlsList="nodownload" oncontextmenu="return false;" preload="metadata"></video>
@@ -991,11 +996,24 @@
           </p>
         </div>
       </div>
-
+ 
+      <!-- Gearbox video wired to videos/gearbox.mp4 -->
+      <div class="sim-card reveal">
+        <video src="videos/gearbox.mp4" controls controlsList="nodownload" oncontextmenu="return false;" preload="metadata"></video>
+        <div class="sim-card-body">
+          <div class="sim-card-title">Gearbox Torque &amp; Contact Force Analysis</div>
+          <div class="sim-card-dwg">DWG-2026-SIM06 · MSC Adams · Transmission System</div>
+          <p class="sim-card-desc">
+            Adams simulation of the ATV gearbox assembly with synchronized contact-torque
+            plotting, verifying torque transfer and gear mesh behavior under load.
+          </p>
+        </div>
+      </div>
+ 
     </div>
   </div>
 </section>
-
+ 
 <section id="process" class="tab-panel">
   <div class="wrap">
     <div class="titleblock reveal">
@@ -1033,7 +1051,7 @@
     </div>
   </div>
 </section>
-
+ 
 <!-- ============ CONTACT / FOOTER ============ -->
 <footer id="contact" class="tab-panel">
   <div class="wrap">
@@ -1074,7 +1092,7 @@
     </div>
   </div>
 </footer>
-
+ 
 <script>
   // ---- reveal on scroll ----
   const els = document.querySelectorAll('.reveal');
@@ -1082,40 +1100,7 @@
     entries.forEach(e=>{ if(e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target); } });
   }, {threshold:0.12});
   els.forEach(el=>io.observe(el));
-
-  // ---- tabbed navigation: nav links switch which section is visible ----
-  const tabPanels = document.querySelectorAll('.tab-panel');
-  const navLinks = document.querySelectorAll('.nav-links a, .nav-cta');
-  const panelIds = Array.from(tabPanels).map(p => p.id);
-  const allTabLinks = document.querySelectorAll('a[href^="#"]');
-
-  function activateTab(id, opts = {}) {
-    if (!panelIds.includes(id)) id = 'about';
-    tabPanels.forEach(p => p.classList.toggle('active', p.id === id));
-    navLinks.forEach(a => {
-      const href = a.getAttribute('href') || '';
-      a.classList.toggle('active-link', href === '#' + id);
-    });
-    // reveal-on-scroll elements inside a freshly-shown panel should appear immediately
-    const panel = document.getElementById(id);
-    if (panel) panel.querySelectorAll('.reveal').forEach(el => el.classList.add('in'));
-    if (!opts.skipScroll) window.scrollTo({ top: 0, behavior: 'auto' });
-    if (!opts.skipHistory) history.replaceState(null, '', '#' + id);
-  }
-
-  allTabLinks.forEach(a => {
-    a.addEventListener('click', (e) => {
-      const href = a.getAttribute('href') || '';
-      if (href.startsWith('#') && panelIds.includes(href.slice(1))) {
-        e.preventDefault();
-        activateTab(href.slice(1));
-      }
-    });
-  });
-
-  const startId = (location.hash || '#about').slice(1);
-  activateTab(startId, { skipHistory: true });
-
+ 
   // ---- copy-email fallback (mailto: depends on OS default mail app, which desktops often lack) ----
   const copyBtn = document.getElementById('copyEmailBtn');
   if (copyBtn) {
@@ -1127,7 +1112,7 @@
       });
     });
   }
-
+ 
   // ---- project category filter tabs ----
   const filterTabs = document.querySelectorAll('.filter-tab');
   const projectCards = document.querySelectorAll('.project[data-cat]');
@@ -1142,8 +1127,9 @@
       });
     });
   });
-
+ 
 </script>
-
+ 
 </body>
 </html>
+ 
