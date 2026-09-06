@@ -539,32 +539,6 @@
       </div>
     </div>
  
-    <!-- Project 1 -->
-    <div class="project reveal" data-cat="kin">
-      <div class="project-head">
-        <div>
-          <div class="project-title">Baja SAE Front Suspension Kinematics Simulator</div>
-          <div class="project-dwg">DWG-2026-BSK · Double-Wishbone Geometry &amp; Ackermann Study</div>
-        </div>
-        <div class="project-tags">
-          <span class="ptag">KINEMATICS</span>
-          <span class="ptag">OPTIMIZATION</span>
-          <span class="ptag">JS/SVG</span>
-        </div>
-      </div>
-      <div class="project-body">
-        <p class="project-desc">
-          Full ADAMS-convention double-wishbone tool with a bump/droop travel sweep and
-          real-time camber, toe, caster, KPI, and Ackermann telemetry. Includes dynamic
-          wheel-track, mechanical trail, and kingpin-offset readouts, plus an AI Tuning tab
-          driven by a coordinate-descent optimizer.
-        </p>
-        <div class="project-links">
-          <a href="baja-suspension-simulator.html" class="plink primary" target="_blank">Launch Live Simulator ↗</a>
-        </div>
-      </div>
-    </div>
- 
     <!-- Project 2 -->
     <div class="project reveal" data-cat="proc">
       <div class="project-head">
@@ -600,7 +574,7 @@
         </div>
         <div class="project-links">
           <a href="cmp-simulator.html" class="plink primary" target="_blank">Launch Live Simulator ↗</a>
-          <a href="https://drive.google.com/file/d/1VTH_OGagWdnr-QWyp2gulBrFFVLfRakQ/view?usp=drive_link" class="plink" target="_blank">Physics Model (Secure)</a>
+          <a href="https://drive.google.com/file/d/1VTH_OGagWdnr-QWyp2gulBrFFVLfRakQ/view?usp=drive_link" class="plink" target="_blank">Physics Model</a>
         </div>
       </div>
     </div>
@@ -632,7 +606,7 @@
           <div class="metric"><div class="v">Detailed Engg. Drawings</div><div class="l">with exploded view and BOM</div></div>
         </div>
         <div class="project-links">
-          <a href="https://drive.google.com/file/d/1WbXosX9wURwleOAHbIXtEr5VQYqXUhRD/view?usp=sharing" class="plink primary" target="_blank">View Report (Secure)</a>
+          <a href="https://drive.google.com/file/d/1WbXosX9wURwleOAHbIXtEr5VQYqXUhRD/view?usp=sharing" class="plink primary" target="_blank">View Report</a>
         </div>
       </div>
     </div>
@@ -720,7 +694,7 @@
           <div class="metric"><div class="v">Creo → Adams → ANSYS</div><div class="l">Full Toolchain</div></div>
         </div>
         <div class="project-links">
-          <a href="https://drive.google.com/file/d/1HB4E84yIr2-HAIJEpY96h7lEXssrKIQ_/view?usp=sharing" class="plink primary" target="_blank">View Report (Secure)</a>
+          <a href="https://drive.google.com/file/d/1HB4E84yIr2-HAIJEpY96h7lEXssrKIQ_/view?usp=sharing" class="plink primary" target="_blank">View Report</a>
         </div>
       </div>
     </div>
@@ -746,6 +720,32 @@
         <div class="metrics-row">
           <div class="metric"><div class="v">Custom</div><div class="l">Rough-Terrain Test Track</div></div>
           <div class="metric"><div class="v">SolidWorks → Adams</div><div class="l">Full Toolchain</div></div>
+        </div>
+      </div>
+    </div>
+
+     <!-- Project 1 -->
+    <div class="project reveal" data-cat="kin">
+      <div class="project-head">
+        <div>
+          <div class="project-title">Baja SAE Front Suspension Kinematics Simulator</div>
+          <div class="project-dwg">DWG-2026-BSK · Double-Wishbone Geometry &amp; Ackermann Study</div>
+        </div>
+        <div class="project-tags">
+          <span class="ptag">KINEMATICS</span>
+          <span class="ptag">OPTIMIZATION</span>
+          <span class="ptag">JS/SVG</span>
+        </div>
+      </div>
+      <div class="project-body">
+        <p class="project-desc">
+          Full ADAMS-convention double-wishbone tool with a bump/droop travel sweep and
+          real-time camber, toe, caster, KPI, and Ackermann telemetry. Includes dynamic
+          wheel-track, mechanical trail, and kingpin-offset readouts, plus an AI Tuning tab
+          driven by a coordinate-descent optimizer.
+        </p>
+        <div class="project-links">
+          <a href="baja-suspension-simulator.html" class="plink primary" target="_blank">Launch Live Simulator ↗</a>
         </div>
       </div>
     </div>
@@ -966,6 +966,33 @@
           </p>
         </div>
       </div>
+
+      <!-- Gearbox video wired to videos/gearbox.mp4 -->
+      <div class="sim-card reveal">
+        <video src="videos/gearbox.mp4" controls controlsList="nodownload" oncontextmenu="return false;" preload="metadata"></video>
+        <div class="sim-card-body">
+          <div class="sim-card-title">Gearbox Torque &amp; Contact Force Analysis</div>
+          <div class="sim-card-dwg">DWG-2026-SIM06 · MSC Adams · Transmission System</div>
+          <p class="sim-card-desc">
+            Adams simulation of the ATV gearbox assembly with synchronized contact-torque
+            plotting, verifying torque transfer and gear mesh behavior under load.
+          </p>
+        </div>
+      </div>
+      
+      <!-- Drop test video wired to videos/drop_test.mp4 -->
+      <div class="sim-card reveal">
+        <video src="videos/drop_test.mp4" controls controlsList="nodownload" oncontextmenu="return false;" preload="metadata"></video>
+        <div class="sim-card-body">
+          <div class="sim-card-title">Upright Loadcase &amp; Drop Test Analysis</div>
+          <div class="sim-card-dwg">DWG-2026-SIM07 · MSC Adams · Suspension System</div>
+          <p class="sim-card-desc">
+            Adams simulation of the Full Vehicle Drop Test from 3 meters of height
+            then plotting graphs of force vs time at the upper and lower ball joints
+            of upright giving necessary loadcases for further CAE Analysis.
+          </p>
+        </div>
+      </div>
  
       <!-- Reaction wheel video  -->
       <div class="sim-card reveal">
@@ -993,32 +1020,7 @@
         </div>
       </div>
  
-      <!-- Gearbox video wired to videos/gearbox.mp4 -->
-      <div class="sim-card reveal">
-        <video src="videos/gearbox.mp4" controls controlsList="nodownload" oncontextmenu="return false;" preload="metadata"></video>
-        <div class="sim-card-body">
-          <div class="sim-card-title">Gearbox Torque &amp; Contact Force Analysis</div>
-          <div class="sim-card-dwg">DWG-2026-SIM06 · MSC Adams · Transmission System</div>
-          <p class="sim-card-desc">
-            Adams simulation of the ATV gearbox assembly with synchronized contact-torque
-            plotting, verifying torque transfer and gear mesh behavior under load.
-          </p>
-        </div>
-      </div>
       
-      <!-- Drop test video wired to videos/drop_test.mp4 -->
-      <div class="sim-card reveal">
-        <video src="videos/drop_test.mp4" controls controlsList="nodownload" oncontextmenu="return false;" preload="metadata"></video>
-        <div class="sim-card-body">
-          <div class="sim-card-title">Upright Loadcase &amp; Drop Test Analysis</div>
-          <div class="sim-card-dwg">DWG-2026-SIM07 · MSC Adams · Suspension System</div>
-          <p class="sim-card-desc">
-            Adams simulation of the Full Vehicle Drop Test from 3 meters of height
-            then plotting graphs of force vs time at the upper and lower ball joints
-            of upright giving necessary loadcases for further CAE Analysis.
-          </p>
-        </div>
-      </div>
  
     </div>
   </div>
