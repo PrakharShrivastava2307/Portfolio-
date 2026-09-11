@@ -283,10 +283,6 @@
     transition:.15s;
   }
   .card-dots:hover{color:var(--orange);border-color:var(--orange-dim);}
-  /* keep title + tags clear of the absolutely-positioned dots button so they never overlap */
-  .project-head{
-    padding-right: 54px;
-  }
   .card-popup{
     position:absolute;inset:0;z-index:10;
     display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;
@@ -315,7 +311,9 @@
   }
   .card-popup-links a:hover{background:var(--orange);color:var(--graphite-950);border-color:var(--orange);}
   .project-head {
-    padding: 24px 24px 0;
+    /* right padding reserves room for the absolutely-positioned three-dot button
+       so long titles/tag rows never run underneath it, on any screen size */
+    padding: 24px 54px 0 24px;
     display: flex;
     flex-direction: column;
     align-items: flex-start;
@@ -426,6 +424,24 @@
   }
   .cad-pending svg{opacity:0.35;}
   .cad-pending span{font-family:var(--mono);font-size:11px;color:var(--text-low);letter-spacing:0.05em;}
+
+  /* ---------- "showing: <project>" filter pill for CAD / SIMS sections ---------- */
+  .section-filter-note{
+    display:none;
+    align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;
+    font-family:var(--mono);font-size:12px;color:var(--text-mid);
+    border:1px solid var(--orange-dim);background:rgba(232,93,45,0.08);
+    padding:10px 16px;margin:-28px 0 32px;
+  }
+  .section-filter-note.active{display:flex;}
+  .section-filter-note b{color:var(--orange);font-weight:600;}
+  .section-filter-note button{
+    font-family:var(--mono);font-size:11px;letter-spacing:0.03em;
+    background:transparent;border:1px solid var(--line);color:var(--text-hi);
+    padding:6px 12px;cursor:pointer;transition:.15s;
+  }
+  .section-filter-note button:hover{border-color:var(--orange);color:var(--orange);}
+  .cad-card.filtered-out,.sim-card.filtered-out{display:none !important;}
 
   /* on narrow screens, a fixed 480px minimum column forces horizontal overflow —
      the card gets wider than the viewport and content gets clipped/cropped.
@@ -808,8 +824,8 @@
           <button type="button" class="card-popup-close" aria-label="Close">✕</button>
           <div class="card-popup-title">ATV Suspension &amp; Steering</div>
           <div class="card-popup-links">
-            <a href="#sims">View Simulation Videos ↓</a>
-            <a href="#cad">View 3D CAD ↓</a>
+            <a href="#sims" class="goto-filter" data-section="sims" data-keys="fourpost,sinusoidal,droptest" data-label="ATV Suspension &amp; Steering">View Simulation Videos ↓</a>
+            <a href="#cad" class="goto-filter" data-section="cad" data-keys="fullvehicle" data-label="ATV Suspension &amp; Steering">View 3D CAD ↓</a>
           </div>
         </div>
       </div>
@@ -837,8 +853,8 @@
           <button type="button" class="card-popup-close" aria-label="Close">✕</button>
           <div class="card-popup-title">Transmission System Analysis</div>
           <div class="card-popup-links">
-            <a href="#sims">View Simulation Video ↓</a>
-            <a href="#cad">View 3D CAD ↓</a>
+            <a href="#sims" class="goto-filter" data-section="sims" data-keys="gearbox" data-label="Transmission System Analysis">View Simulation Video ↓</a>
+            <a href="#cad" class="goto-filter" data-section="cad" data-keys="fullvehicle" data-label="Transmission System Analysis">View 3D CAD ↓</a>
           </div>
         </div>
       </div>
@@ -868,8 +884,8 @@
           <div class="card-popup-title">Reaction Wheel Attitude Control</div>
           <div class="card-popup-links">
             <a href="https://drive.google.com/file/d/1HB4E84yIr2-HAIJEpY96h7lEXssrKIQ_/view?usp=sharing" target="_blank">View Report</a>
-            <a href="#sims">View Simulation Video ↓</a>
-            <a href="#cad">View 3D CAD ↓</a>
+            <a href="#sims" class="goto-filter" data-section="sims" data-keys="reactionwheel" data-label="Reaction Wheel Attitude Control">View Simulation Video ↓</a>
+            <a href="#cad" class="goto-filter" data-section="cad" data-keys="reactionwheel" data-label="Reaction Wheel Attitude Control">View 3D CAD ↓</a>
           </div>
         </div>
       </div>
@@ -897,8 +913,8 @@
           <button type="button" class="card-popup-close" aria-label="Close">✕</button>
           <div class="card-popup-title">Rocker-Bogie Rover Suspension</div>
           <div class="card-popup-links">
-            <a href="#sims">View Simulation Video ↓</a>
-            <a href="#cad">View 3D CAD ↓</a>
+            <a href="#sims" class="goto-filter" data-section="sims" data-keys="rover" data-label="Rocker-Bogie Rover Suspension">View Simulation Video ↓</a>
+            <a href="#cad" class="goto-filter" data-section="cad" data-keys="rover" data-label="Rocker-Bogie Rover Suspension">View 3D CAD ↓</a>
           </div>
         </div>
       </div>
@@ -947,10 +963,15 @@
       </div>
     </div>
  
+    <div class="section-filter-note" id="cadFilterNote">
+      <span>Showing: <b id="cadFilterLabel"></b></span>
+      <button type="button" id="cadFilterReset">Show all ✕</button>
+    </div>
+ 
     <div class="cad-grid">
  
       <!-- Full Vehicle Baja Assembly -->
-      <div class="cad-card reveal">
+      <div class="cad-card reveal" data-key="fullvehicle">
         <video src="videos/full_vehicle_baja.mp4" controls controlsList="nodownload noremoteplayback" disablePictureInPicture oncontextmenu="return false;" preload="metadata"></video>
         <div class="cad-card-body">
           <div class="cad-card-title">Full Vehicle Baja Assembly</div>
@@ -961,7 +982,7 @@
       </div>
  
       <!-- Rover model -->
-      <div class="cad-card reveal">
+      <div class="cad-card reveal" data-key="rover">
         <model-viewer
           src="models/rover_asm_f_asm.glb"
           alt="Rocker-bogie rover chassis 3D model"
@@ -980,7 +1001,7 @@
       </div>
       
       <!-- Reaction wheel model -->
-      <div class="cad-card reveal">
+      <div class="cad-card reveal" data-key="reactionwheel">
         <model-viewer
           src="models/reaction-wheel.glb"
           alt="Reaction wheel assembly 3D model"
@@ -998,7 +1019,7 @@
         </div>
       </div>
       <!-- Stormbreaker model -->
-      <div class="cad-card reveal">
+      <div class="cad-card reveal" data-key="stormbreaker">
         <model-viewer
           src="models/stormbreaker.glb"
           alt="Stormbreaker 3D model"
@@ -1117,13 +1138,30 @@
       <div class="tb-eyebrow">Footage</div>
       <div class="titleblock-row">
         <h2>Dynamic Simulations</h2>
-        <div class="tb-meta"><span class="tb-num">05</span><br>MSC ADAMS · ANSYS</div>
+        <div class="tb-meta"><span class="tb-num">05</span><br>MSC ADAMS · ANSYS · IPG CARMAKER</div>
       </div>
+    </div>
+ 
+    <div class="section-filter-note" id="simsFilterNote">
+      <span>Showing: <b id="simsFilterLabel"></b></span>
+      <button type="button" id="simsFilterReset">Show all ✕</button>
     </div>
  
     <div class="sim-grid">
  
-      <div class="sim-card reveal">
+      <!-- IPG CarMaker vehicle dynamics recording -->
+      <div class="sim-card reveal" data-key="ipgcarmaker">
+        <video src="videos/ipg_carmaker.mp4" controls controlsList="nodownload noremoteplayback" disablePictureInPicture oncontextmenu="return false;" preload="metadata"></video>
+        <div class="sim-card-body">
+          <div class="sim-card-title">IPG CarMaker Vehicle Dynamics Simulation</div>
+          <p class="sim-card-desc">
+            Full-vehicle dynamics run in IPG CarMaker, used to validate handling and
+            ride behavior against the Adams MBD model.
+          </p>
+        </div>
+      </div>
+ 
+      <div class="sim-card reveal" data-key="fourpost">
         <video src="videos/fourpost_rig.mp4" controls controlsList="nodownload noremoteplayback" disablePictureInPicture oncontextmenu="return false;" preload="metadata"></video>
         <div class="sim-card-body">
           <div class="sim-card-title">Four-Post Rig Simulation</div>
@@ -1134,7 +1172,7 @@
         </div>
       </div>
  
-      <div class="sim-card reveal">
+      <div class="sim-card reveal" data-key="sinusoidal">
         <video src="videos/sinusoidal_ride.mp4" controls controlsList="nodownload noremoteplayback" disablePictureInPicture oncontextmenu="return false;" preload="metadata"></video>
         <div class="sim-card-body">
           <div class="sim-card-title">Sinusoidal Ride Analysis</div>
@@ -1145,7 +1183,7 @@
       </div>
 
       <!-- Gearbox video wired to videos/gearbox.mp4 -->
-      <div class="sim-card reveal">
+      <div class="sim-card reveal" data-key="gearbox">
         <video src="videos/gearbox.mp4" controls controlsList="nodownload noremoteplayback" disablePictureInPicture oncontextmenu="return false;" preload="metadata"></video>
         <div class="sim-card-body">
           <div class="sim-card-title">Gearbox Torque &amp; Contact Force Analysis</div>
@@ -1157,7 +1195,7 @@
       </div>
       
       <!-- Drop test video wired to videos/drop_test.mp4 -->
-      <div class="sim-card reveal">
+      <div class="sim-card reveal" data-key="droptest">
         <video src="videos/drop_test.mp4" controls controlsList="nodownload noremoteplayback" disablePictureInPicture oncontextmenu="return false;" preload="metadata"></video>
         <div class="sim-card-body">
           <div class="sim-card-title">Upright Loadcase &amp; Drop Test Analysis</div>
@@ -1170,7 +1208,7 @@
       </div>
  
       <!-- Reaction wheel video  -->
-      <div class="sim-card reveal">
+      <div class="sim-card reveal" data-key="reactionwheel">
         <video src="videos/three_motors.mp4" controls controlsList="nodownload noremoteplayback" disablePictureInPicture oncontextmenu="return false;" preload="metadata"></video>
         <div class="sim-card-body">
           <div class="sim-card-title">Reaction Wheel Rotational Dynamics</div>
@@ -1182,7 +1220,7 @@
       </div>
  
       <!-- Rover video -->
-      <div class="sim-card reveal">
+      <div class="sim-card reveal" data-key="rover">
         <video src="videos/rover.mp4" controls controlsList="nodownload noremoteplayback" disablePictureInPicture oncontextmenu="return false;" preload="metadata"></video>
         <div class="sim-card-body">
           <div class="sim-card-title">Rocker-Bogie Rover — Rough-Terrain Traversal</div>
@@ -1384,6 +1422,66 @@
     if (e.key === 'Escape') {
       document.querySelectorAll('.project.popup-open').forEach(p => p.classList.remove('popup-open'));
     }
+  });
+
+  // ---- "view simulation/CAD" popup links: jump to the specific card(s) only,
+  //      instead of dropping the visitor into the whole section ----
+  const sectionFilterConfig = {
+    sims: { grid: '.sim-grid', card: '.sim-card', note: '#simsFilterNote', label: '#simsFilterLabel', reset: '#simsFilterReset' },
+    cad:  { grid: '.cad-grid',  card: '.cad-card',  note: '#cadFilterNote',  label: '#cadFilterLabel',  reset: '#cadFilterReset'  }
+  };
+
+  function applySectionFilter(sectionKey, keys, label) {
+    const cfg = sectionFilterConfig[sectionKey];
+    if (!cfg) return;
+    const cards = document.querySelectorAll(cfg.card);
+    cards.forEach(card => {
+      const show = keys.includes(card.dataset.key);
+      card.classList.toggle('filtered-out', !show);
+    });
+    const note = document.querySelector(cfg.note);
+    const labelEl = document.querySelector(cfg.label);
+    if (note && labelEl) {
+      labelEl.textContent = label;
+      note.classList.add('active');
+    }
+  }
+
+  function clearSectionFilter(sectionKey) {
+    const cfg = sectionFilterConfig[sectionKey];
+    if (!cfg) return;
+    document.querySelectorAll(cfg.card).forEach(card => card.classList.remove('filtered-out'));
+    const note = document.querySelector(cfg.note);
+    if (note) note.classList.remove('active');
+  }
+
+  document.querySelectorAll('.goto-filter').forEach(link => {
+    link.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      const sectionKey = link.dataset.section;
+      const keys = (link.dataset.keys || '').split(',').map(s => s.trim()).filter(Boolean);
+      const label = link.dataset.label || '';
+      applySectionFilter(sectionKey, keys, label);
+      // close whichever project popup triggered this
+      document.querySelectorAll('.project.popup-open').forEach(p => p.classList.remove('popup-open'));
+      const target = document.getElementById(sectionKey);
+      if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+  });
+
+  Object.keys(sectionFilterConfig).forEach(sectionKey => {
+    const cfg = sectionFilterConfig[sectionKey];
+    const resetBtn = document.querySelector(cfg.reset);
+    if (resetBtn) resetBtn.addEventListener('click', () => clearSectionFilter(sectionKey));
+  });
+
+  // plain nav-bar / other links to #sims or #cad (not tied to a project) should clear any active filter
+  document.querySelectorAll('a[href="#sims"]:not(.goto-filter), a[href="#cad"]:not(.goto-filter)').forEach(link => {
+    link.addEventListener('click', () => {
+      clearSectionFilter('sims');
+      clearSectionFilter('cad');
+    });
   });
 
   // ---- project category filter tabs ----
