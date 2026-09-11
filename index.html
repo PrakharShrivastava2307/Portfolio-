@@ -32,12 +32,19 @@
   }
   *{box-sizing:border-box;margin:0;padding:0;}
   html{scroll-behavior:smooth;}
+  html,body{max-width:100%;overflow-x:hidden;}
   body{
     background:var(--graphite-950);
     color:var(--text-hi);
     font-family:var(--sans);
     line-height:1.55;
     -webkit-font-smoothing:antialiased;
+  }
+  img,video,model-viewer,iframe{max-width:100%;}
+  @media(max-width:640px){
+    section{padding:56px 0;}
+    .hero{padding:64px 0 48px;}
+    .process{padding:56px 0;}
   }
   ::selection{background:var(--orange);color:var(--graphite-950);}
  
@@ -83,7 +90,47 @@
   @media(max-width:700px){ .nav-cta{display:none;} }
   .nav-links a:focus-visible{outline:2px solid var(--orange);outline-offset:4px;}
   .nav-links a.active-link{color:var(--orange);}
-  @media(max-width:700px){ .nav-links{display:none;} }
+
+  /* ---------- mobile hamburger ---------- */
+  .nav-burger{
+    display:none;
+    width:38px;height:38px;
+    border:1px solid var(--line);background:transparent;
+    align-items:center;justify-content:center;
+    cursor:pointer;flex-shrink:0;
+  }
+  .nav-burger span{
+    display:block;width:18px;height:2px;background:var(--text-hi);position:relative;
+    transition:transform .2s ease, opacity .2s ease, background .2s ease;
+  }
+  .nav-burger span::before,.nav-burger span::after{
+    content:'';position:absolute;left:0;width:18px;height:2px;background:var(--text-hi);
+    transition:transform .2s ease, top .2s ease;
+  }
+  .nav-burger span::before{top:-6px;}
+  .nav-burger span::after{top:6px;}
+  .nav-burger.open span{background:transparent;}
+  .nav-burger.open span::before{top:0;transform:rotate(45deg);}
+  .nav-burger.open span::after{top:0;transform:rotate(-45deg);}
+
+  @media(max-width:700px){
+    .nav-burger{display:flex;}
+    .nav-links{
+      display:flex;flex-direction:column;gap:0;
+      position:fixed;top:69px;left:0;right:0;
+      background:var(--graphite-900);
+      border-bottom:1px solid var(--line);
+      max-height:0;overflow:hidden;
+      transition:max-height .25s ease;
+      z-index:49;
+    }
+    .nav-links.open{max-height:400px;}
+    .nav-links a{padding:16px 24px;border-top:1px solid var(--line);font-size:13.5px;}
+    .nav-links a:first-child{border-top:none;}
+    .nav-cta.mobile-cta{
+      display:block;margin:14px 24px 18px;text-align:center;
+    }
+  }
  
   /* ---------- tabbed content panels ---------- */
   .tab-panel{display:block;}
@@ -211,6 +258,9 @@
     grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
     gap: 24px;
   }
+  @media(max-width:420px){
+    .project-grid{ grid-template-columns: 1fr; gap: 16px; }
+  }
 
   .project {
     border: 1px solid var(--line);
@@ -289,6 +339,13 @@
     text-transform: uppercase;
     letter-spacing: 0.05em;
     margin-top: 3px;
+  }
+  @media(max-width:480px){
+    .metrics-row{ grid-template-columns: 1fr 1fr; }
+    .project-head{ padding: 20px 18px 0; }
+    .project-body{ padding: 14px 18px 20px; }
+    .project-title{ font-size: 16px; }
+    .hero-viz{ aspect-ratio: 1/1.05; }
   }
  
   .project-links { display: flex; gap: 10px; flex-wrap: wrap; }
@@ -453,6 +510,26 @@
     .reveal{opacity:1;transform:none;transition:none;}
     html{scroll-behavior:auto;}
   }
+
+  /* ---------- copy/download deterrents (client-side only — see chat notes on limits) ---------- */
+  body{
+    -webkit-user-select:none; -moz-user-select:none; -ms-user-select:none; user-select:none;
+  }
+  img, video, model-viewer{
+    -webkit-user-drag:none; user-drag:none;
+    pointer-events:auto;
+  }
+  /* block "print to PDF" as a save workaround */
+  @media print{
+    body::before{
+      content:"This content is not available for printing or export.";
+      display:block;position:fixed;inset:0;background:#fff;color:#000;
+      font-family:sans-serif;font-size:20px;padding:40px;z-index:99999;
+    }
+    body > *{display:none !important;}
+  }
+  /* best-effort visual deterrent when the tab loses focus (does NOT block OS/phone screenshots) */
+  body.win-blurred > *:not(#protectOverlay){ filter: blur(18px); transition: filter .15s ease; }
 </style>
 </head>
 <body class="grid-bg">
@@ -460,7 +537,7 @@
 <header class="nav">
   <div class="nav-inner">
     <div class="brand">PRAKHAR <span class="accent">SHRIVASTAVA</span></div>
-    <nav class="nav-links">
+    <nav class="nav-links" id="navLinks">
       <a href="#about">ABOUT</a>
       <a href="#projects">PROJECTS</a>
       <a href="#cad">3D CAD</a>
@@ -468,8 +545,12 @@
       <a href="#sims">SIMULATIONS</a>
       <a href="#process">METHOD</a>
       <a href="#contact">CONTACT</a>
+      <a href="#contact" class="nav-cta mobile-cta">Get in Touch</a>
     </nav>
     <a href="#contact" class="nav-cta">Get in Touch</a>
+    <button type="button" class="nav-burger" id="navBurger" aria-label="Toggle menu" aria-expanded="false" aria-controls="navLinks">
+      <span></span>
+    </button>
   </div>
 </header>
  
@@ -644,13 +725,13 @@
             this simulator: a four-bar crank-rocker linkage driving pad motion, Preston-
             equation material removal, contact mechanics, and surface-topography fitting,
             with an Intelligent Planner tab (synchronized base/top-disc inputs, comparative
-            per-disc graphs, toggleable cumulative wear-progression) and a LaTeX/TikZ
-            physics-model reference with full first-principles derivations.
+            per-disc graphs, toggleable cumulative wear-progression) and a physics-model 
+            reference with full first-principles derivations.
           </p>
           <div class="metrics-row">
             <div class="metric"><div class="v">QRM-Free</div><div class="l">4-Bar Redesign</div></div>
-            <div class="metric"><div class="v">Machine Runtime Optimization</div><div class="l">by live tracking of MRR and Depth</div></div>
-            <div class="metric"><div class="v">AI-Based Predictive Algorithm </div><div class="l">for Flatness of surfaces</div></div>
+            <div class="metric"><div class="v">Real-Time</div><div class="l">MRR &amp; Depth Tracking</div></div>
+            <div class="metric"><div class="v">AI-Based</div><div class="l">Flatness Prediction</div></div>
           </div>
           <div class="project-links">
             <a href="cmp-simulator.html" class="plink primary" target="_blank">Launch Live Simulator ↗</a>
@@ -681,9 +762,9 @@
             Engg. Drawings of all the components,exploded view and BOM of the assembly
           </p>
           <div class="metrics-row">
-            <div class="metric"><div class="v">Modelling → Analysis → Drafting</div><div class="l">complete design workflow</div></div>
-            <div class="metric"><div class="v">3-Stages of Analysis</div><div class="l">Modal → PSD → Post-Processing</div></div>
-            <div class="metric"><div class="v">Detailed Engg. Drawings</div><div class="l">with exploded view and BOM</div></div>
+            <div class="metric"><div class="v">Full Workflow</div><div class="l">Modelling → Analysis → Drafting</div></div>
+            <div class="metric"><div class="v">3 Stages</div><div class="l">Modal → PSD → Post-Processing</div></div>
+            <div class="metric"><div class="v">Full Docs</div><div class="l">Drawings, Exploded View &amp; BOM</div></div>
           </div>
           <div class="project-links">
             <a href="https://drive.google.com/file/d/1WbXosX9wURwleOAHbIXtEr5VQYqXUhRD/view?usp=sharing" class="plink primary" target="_blank">View Report</a>
@@ -716,9 +797,9 @@
             led this division and trained juniors on Creo, SolidWorks, and Adams.
           </p>
           <div class="metrics-row">
-            <div class="metric"><div class="v">Ride Analysis</div><div class="l">4-Post Rig + Sine + Drop Test</div></div>
+            <div class="metric"><div class="v">3-Test Suite</div><div class="l">4-Post Rig + Sine + Drop</div></div>
             <div class="metric"><div class="v">Full</div><div class="l">Hardpoint Definition</div></div>
-            <div class="metric"><div class="v">1st</div><div class="l">Rank, E-BAJA 2026 Validation</div></div>
+            <div class="metric"><div class="v">1st Rank</div><div class="l">E-BAJA 2026 Validation</div></div>
           </div>
         </div>
       </div>
@@ -744,7 +825,7 @@
           </p>
           <div class="metrics-row">
             <div class="metric"><div class="v">CV Shaft</div><div class="l">Joint Safety Validation</div></div>
-            <div class="metric"><div class="v">Full Susp/Steering Travel</div><div class="l">Plunge/Articulation calculations</div></div>
+            <div class="metric"><div class="v">Full Travel</div><div class="l">Plunge &amp; Articulation</div></div>
           </div>
         </div>
       </div>
@@ -771,7 +852,7 @@
           </p>
           <div class="metrics-row">
             <div class="metric"><div class="v">3-Axis</div><div class="l">Euler Control Architecture</div></div>
-            <div class="metric"><div class="v">Creo → Adams → ANSYS</div><div class="l">Full Toolchain</div></div>
+            <div class="metric"><div class="v">Full Chain</div><div class="l">Creo → Adams → ANSYS</div></div>
           </div>
           <div class="project-links">
             <a href="https://drive.google.com/file/d/1HB4E84yIr2-HAIJEpY96h7lEXssrKIQ_/view?usp=sharing" class="plink primary" target="_blank">View Report</a>
@@ -799,7 +880,7 @@
           </p>
           <div class="metrics-row">
             <div class="metric"><div class="v">Custom</div><div class="l">Rough-Terrain Test Track</div></div>
-            <div class="metric"><div class="v">SolidWorks → Adams</div><div class="l">Full Toolchain</div></div>
+            <div class="metric"><div class="v">Full Chain</div><div class="l">SolidWorks → Adams</div></div>
           </div>
         </div>
       </div>
@@ -849,7 +930,7 @@
  
       <!-- Full Vehicle Baja Assembly -->
       <div class="cad-card reveal">
-        <video src="videos/full_vehicle_baja.mp4" controls controlsList="nodownload" oncontextmenu="return false;" preload="metadata"></video>
+        <video src="videos/full_vehicle_baja.mp4" controls controlsList="nodownload noremoteplayback" disablePictureInPicture oncontextmenu="return false;" preload="metadata"></video>
         <div class="cad-card-body">
           <div class="cad-card-title">Full Vehicle Baja Assembly</div>
           <div class="cad-card-dwg">DWG-2026-CAD06 · Electric ATV Assembly</div>
@@ -1026,7 +1107,7 @@
     <div class="sim-grid">
  
       <div class="sim-card reveal">
-        <video src="videos/fourpost_rig.mp4" controls controlsList="nodownload" oncontextmenu="return false;" preload="metadata"></video>
+        <video src="videos/fourpost_rig.mp4" controls controlsList="nodownload noremoteplayback" disablePictureInPicture oncontextmenu="return false;" preload="metadata"></video>
         <div class="sim-card-body">
           <div class="sim-card-title">Four-Post Rig Simulation</div>
           <div class="sim-card-dwg">DWG-2026-SIM01 · MSC Adams · ATV Suspension</div>
@@ -1038,7 +1119,7 @@
       </div>
  
       <div class="sim-card reveal">
-        <video src="videos/sinusoidal_ride.mp4" controls controlsList="nodownload" oncontextmenu="return false;" preload="metadata"></video>
+        <video src="videos/sinusoidal_ride.mp4" controls controlsList="nodownload noremoteplayback" disablePictureInPicture oncontextmenu="return false;" preload="metadata"></video>
         <div class="sim-card-body">
           <div class="sim-card-title">Sinusoidal Ride Analysis</div>
           <div class="sim-card-dwg">DWG-2026-SIM01B · MSC Adams · ATV Suspension</div>
@@ -1050,7 +1131,7 @@
 
       <!-- Gearbox video wired to videos/gearbox.mp4 -->
       <div class="sim-card reveal">
-        <video src="videos/gearbox.mp4" controls controlsList="nodownload" oncontextmenu="return false;" preload="metadata"></video>
+        <video src="videos/gearbox.mp4" controls controlsList="nodownload noremoteplayback" disablePictureInPicture oncontextmenu="return false;" preload="metadata"></video>
         <div class="sim-card-body">
           <div class="sim-card-title">Gearbox Torque &amp; Contact Force Analysis</div>
           <div class="sim-card-dwg">DWG-2026-SIM06 · MSC Adams · Transmission System</div>
@@ -1063,7 +1144,7 @@
       
       <!-- Drop test video wired to videos/drop_test.mp4 -->
       <div class="sim-card reveal">
-        <video src="videos/drop_test.mp4" controls controlsList="nodownload" oncontextmenu="return false;" preload="metadata"></video>
+        <video src="videos/drop_test.mp4" controls controlsList="nodownload noremoteplayback" disablePictureInPicture oncontextmenu="return false;" preload="metadata"></video>
         <div class="sim-card-body">
           <div class="sim-card-title">Upright Loadcase &amp; Drop Test Analysis</div>
           <div class="sim-card-dwg">DWG-2026-SIM07 · MSC Adams · Suspension System</div>
@@ -1077,7 +1158,7 @@
  
       <!-- Reaction wheel video  -->
       <div class="sim-card reveal">
-        <video src="videos/three_motors.mp4" controls controlsList="nodownload" oncontextmenu="return false;" preload="metadata"></video>
+        <video src="videos/three_motors.mp4" controls controlsList="nodownload noremoteplayback" disablePictureInPicture oncontextmenu="return false;" preload="metadata"></video>
         <div class="sim-card-body">
           <div class="sim-card-title">Reaction Wheel Rotational Dynamics</div>
           <div class="sim-card-dwg">DWG-2026-SIM04 · MSC Adams · Attitude Control</div>
@@ -1090,7 +1171,7 @@
  
       <!-- Rover video -->
       <div class="sim-card reveal">
-        <video src="videos/rover.mp4" controls controlsList="nodownload" oncontextmenu="return false;" preload="metadata"></video>
+        <video src="videos/rover.mp4" controls controlsList="nodownload noremoteplayback" disablePictureInPicture oncontextmenu="return false;" preload="metadata"></video>
         <div class="sim-card-body">
           <div class="sim-card-title">Rocker-Bogie Rover — Rough-Terrain Traversal</div>
           <div class="sim-card-dwg">DWG-2026-SIM05 · MSC Adams · Articulation Study</div>
@@ -1180,6 +1261,7 @@
       </div>
     </div>
     <div class="foot-bottom">
+      <span>© 2026 Prakhar Shrivastava. All rights reserved.</span>
       <span>SGSITS INDORE · UG IV YEAR, MECHANICAL ENGINEERING</span>
       <span>DWG NO. IDX—000 · REV. A · 2026</span>
     </div>
@@ -1206,6 +1288,46 @@
     });
   }
  
+  // ---- copy/download deterrents (client-side only, best-effort — see chat notes) ----
+  document.addEventListener('contextmenu', e => e.preventDefault());
+  document.addEventListener('dragstart', e => e.preventDefault());
+  document.addEventListener('keydown', e => {
+    const k = e.key ? e.key.toLowerCase() : '';
+    const blockCombo =
+      k === 'f12' ||
+      (e.ctrlKey && e.shiftKey && ['i','j','c'].includes(k)) ||
+      (e.metaKey && e.altKey && ['i','j','c'].includes(k)) || // Safari/mac devtools
+      (e.ctrlKey && ['u','s','p'].includes(k)) ||
+      (e.metaKey && ['s','p'].includes(k));
+    if (blockCombo) e.preventDefault();
+  });
+  // cosmetic blur while tab/window is not focused — a deterrent for casual screen recording,
+  // it cannot and does not block OS or phone screenshots (see chat notes)
+  window.addEventListener('blur', () => document.body.classList.add('win-blurred'));
+  window.addEventListener('focus', () => document.body.classList.remove('win-blurred'));
+  document.addEventListener('visibilitychange', () => {
+    document.body.classList.toggle('win-blurred', document.hidden);
+  });
+  console.log('%cContent on this site is © Prakhar Shrivastava. Do not copy or redistribute without permission.', 'color:#e85d2d;font-size:13px;font-family:monospace;');
+
+  // ---- mobile hamburger nav ----
+  const navBurger = document.getElementById('navBurger');
+  const navLinks = document.getElementById('navLinks');
+  if (navBurger && navLinks) {
+    navBurger.addEventListener('click', () => {
+      const isOpen = navLinks.classList.toggle('open');
+      navBurger.classList.toggle('open', isOpen);
+      navBurger.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+    });
+    navLinks.querySelectorAll('a').forEach(a => {
+      a.addEventListener('click', () => {
+        navLinks.classList.remove('open');
+        navBurger.classList.remove('open');
+        navBurger.setAttribute('aria-expanded', 'false');
+      });
+    });
+  }
+
   // ---- project category filter tabs ----
   const filterTabs = document.querySelectorAll('.filter-tab');
   const projectCards = document.querySelectorAll('.project[data-cat]');
