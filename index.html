@@ -824,7 +824,7 @@
           <button type="button" class="card-popup-close" aria-label="Close">✕</button>
           <div class="card-popup-title">ATV Suspension &amp; Steering</div>
           <div class="card-popup-links">
-            <a href="#sims" class="goto-filter" data-section="sims" data-keys="fourpost,sinusoidal,droptest" data-label="ATV Suspension &amp; Steering">View Simulation Videos ↓</a>
+            <a href="#sims" class="goto-filter" data-section="sims" data-keys="fourpost,sinusoidal,droptest,turningradius,ipgcarmaker" data-label="ATV Suspension &amp; Steering">View Simulation Videos ↓</a>
             <a href="#cad" class="goto-filter" data-section="cad" data-keys="fullvehicle" data-label="ATV Suspension &amp; Steering">View 3D CAD ↓</a>
           </div>
         </div>
@@ -1157,6 +1157,18 @@
           <p class="sim-card-desc">
             Full-vehicle dynamics run in IPG CarMaker, used to validate handling and
             ride behavior against the Adams MBD model.
+          </p>
+        </div>
+      </div>
+ 
+      <!-- Turning radius / Ackermann validation -->
+      <div class="sim-card reveal" data-key="turningradius">
+        <video src="videos/turning_radius.mp4" controls controlsList="nodownload noremoteplayback" disablePictureInPicture oncontextmenu="return false;" preload="metadata"></video>
+        <div class="sim-card-body">
+          <div class="sim-card-title">Turning Radius &amp; Ackermann Validation</div>
+          <p class="sim-card-desc">
+            Full-vehicle MBD animation of the steering turning-radius sweep, used to
+            validate Ackermann geometry and minimum turning circle for the ATV.
           </p>
         </div>
       </div>
