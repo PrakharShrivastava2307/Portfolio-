@@ -32,7 +32,13 @@
   }
   *{box-sizing:border-box;margin:0;padding:0;}
   html{scroll-behavior:smooth;}
-  html,body{max-width:100%;overflow-x:hidden;}
+  html,body{max-width:100%;}
+  /* NOTE: overflow-x must NOT be set on html/body — doing so forces the browser to
+     compute overflow-y:auto too, which turns body into its own scroll container and
+     breaks position:sticky on the header on mobile (it stops sticking once you scroll).
+     The horizontal-overflow guard now lives on .page-scope below, wrapped around
+     everything except the sticky header itself. */
+  .page-scope{overflow-x:hidden;max-width:100%;}
   body{
     background:var(--graphite-950);
     color:var(--text-hi);
@@ -132,6 +138,10 @@
     .nav-links a:first-child{border-top:none;}
     .nav-cta.mobile-cta{
       display:block;margin:14px 24px 18px;text-align:center;
+      /* .nav-links a above sets border-top:var(--line) (grey) on every <a>, including this
+         one — since it's more specific it was overriding just the top edge of this button's
+         orange-dim border, leaving 3 orange sides + 1 grey side. Force all 4 sides to match. */
+      border-top:1px solid var(--orange-dim);
     }
   }
  
@@ -571,6 +581,26 @@
   }
   /* best-effort visual deterrent when the tab loses focus (does NOT block OS/phone screenshots) */
   body.win-blurred > *:not(#protectOverlay){ filter: blur(18px); transition: filter .15s ease; }
+
+  /* ---------- universal orange tap/click highlight ---------- */
+  /* kill the default grey/blue flash mobile browsers show on tap, so our own
+     orange feedback is the only thing you see */
+  a, button, .project, .cad-card, .sim-card, .draft-card-sheet, .filter-tab, .card-dots{
+    -webkit-tap-highlight-color: transparent;
+  }
+  a, button, .project, .cad-card, .sim-card, .draft-card-sheet, .filter-tab, .card-dots{
+    outline: 2px solid transparent;
+    outline-offset: 2px;
+    transition: outline-color .12s ease;
+  }
+  a:focus-visible, button:focus-visible,
+  .project:focus-visible, .cad-card:focus-visible, .sim-card:focus-visible,
+  .draft-card-sheet:focus-visible, .filter-tab:focus-visible, .card-dots:focus-visible,
+  a.tap-active, button.tap-active,
+  .project.tap-active, .cad-card.tap-active, .sim-card.tap-active,
+  .draft-card-sheet.tap-active, .filter-tab.tap-active, .card-dots.tap-active{
+    outline-color: var(--orange);
+  }
 </style>
 </head>
 <body class="grid-bg">
@@ -594,6 +624,8 @@
     </button>
   </div>
 </header>
+
+<div class="page-scope">
  
 <!-- ============ HERO ============ -->
 <section class="hero">
@@ -1308,6 +1340,13 @@
           </div>
         </div>
         <div class="info-block">
+          <div class="info-block-label">Phone</div>
+          <div class="info-block-value" style="display:flex;align-items:center;gap:10px;">
+            <a href="tel:+918839984408">+91 88399 84408</a>
+            <button type="button" id="copyPhoneBtn" style="font-family:var(--mono);font-size:10.5px;font-weight:400;background:transparent;border:1px solid var(--line);color:var(--text-low);padding:3px 8px;border-radius:2px;cursor:pointer;letter-spacing:0.04em;">COPY</button>
+          </div>
+        </div>
+        <div class="info-block">
           <div class="info-block-label">LinkedIn</div>
           <div class="info-block-value"><a href="https://www.linkedin.com/in/prakhar-shrivastava-883152336" target="_blank">linkedin.com/in/prakhar-shrivastava</a></div>
         </div>
@@ -1328,7 +1367,29 @@
   </div>
 </footer>
  
+</div> <!-- /.page-scope -->
+
 <script>
+  // ---- universal orange tap/click highlight ----
+  // :active is unreliable on non-form elements (divs like .project/.cad-card) on iOS
+  // Safari without a touch listener, so drive a real class instead — this also lets
+  // the highlight persist briefly after release, which reads better as "click feedback".
+  const tapTargets = 'a, button, .project, .cad-card, .sim-card, .draft-card-sheet, .filter-tab, .card-dots';
+  const clearTapActive = (except) => {
+    document.querySelectorAll('.tap-active').forEach(el => { if (el !== except) el.classList.remove('tap-active'); });
+  };
+  document.addEventListener('pointerdown', (e) => {
+    const el = e.target.closest(tapTargets);
+    if (!el) { clearTapActive(); return; }
+    clearTapActive(el);
+    el.classList.add('tap-active');
+  }, { passive: true });
+  document.addEventListener('pointerup', (e) => {
+    const el = e.target.closest(tapTargets);
+    if (el) setTimeout(() => el.classList.remove('tap-active'), 250);
+  });
+  document.addEventListener('pointercancel', () => clearTapActive());
+
   // ---- reveal on scroll ----
   const els = document.querySelectorAll('.reveal');
   const io = new IntersectionObserver((entries)=>{
@@ -1344,6 +1405,18 @@
         const original = copyBtn.textContent;
         copyBtn.textContent = 'COPIED';
         setTimeout(() => { copyBtn.textContent = original; }, 1500);
+      });
+    });
+  }
+
+  // ---- copy-phone fallback (tel: depends on the device having a phone/dialer app) ----
+  const copyPhoneBtn = document.getElementById('copyPhoneBtn');
+  if (copyPhoneBtn) {
+    copyPhoneBtn.addEventListener('click', () => {
+      navigator.clipboard.writeText('+91 8839984408').then(() => {
+        const original = copyPhoneBtn.textContent;
+        copyPhoneBtn.textContent = 'COPIED';
+        setTimeout(() => { copyPhoneBtn.textContent = original; }, 1500);
       });
     });
   }
